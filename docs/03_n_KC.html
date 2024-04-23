@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3.13 技术指标14：凯尔特纳通道 Technical Indicator 14: Keltner Channels (KC) | 全球多资产策略量化模型  Global Multi-asset Investment Strategy</title>
+  <meta name="description" content="全球多资产量化模型搭建说明 Global Multi-asset Strategy(MAS) Quantitative Model e-Manual" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3.13 技术指标14：凯尔特纳通道 Technical Indicator 14: Keltner Channels (KC) | 全球多资产策略量化模型  Global Multi-asset Investment Strategy" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="全球多资产量化模型搭建说明 Global Multi-asset Strategy(MAS) Quantitative Model e-Manual" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3.13 技术指标14：凯尔特纳通道 Technical Indicator 14: Keltner Channels (KC) | 全球多资产策略量化模型  Global Multi-asset Investment Strategy" />
+  
+  <meta name="twitter:description" content="全球多资产量化模型搭建说明 Global Multi-asset Strategy(MAS) Quantitative Model e-Manual" />
+  
+
+
+
+<meta name="date" content="2024-04-23" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="03_m_PVT.html"/>
+<link rel="next" href="03_o_Donchian.html"/>
+<script src="assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="assets/kePrint-0.0.1/kePrint.js"></script>
+<link href="assets/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="assets/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+<script src="assets/bsTable-3.3.7/bootstrapTable.js"></script>
+<script src="assets/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="assets/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="assets/datatables-binding-0.32/datatables.js"></script>
+<link href="assets/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="assets/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="assets/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="assets/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="assets/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="assets/dt-ext-buttons-1.13.6/css/buttons.dataTables.min.css" rel="stylesheet" />
+<script src="assets/dt-ext-buttons-1.13.6/js/dataTables.buttons.min.js"></script>
+<script src="assets/dt-ext-buttons-1.13.6/js/buttons.html5.min.js"></script>
+<script src="assets/dt-ext-buttons-1.13.6/js/buttons.colVis.min.js"></script>
+<script src="assets/dt-ext-buttons-1.13.6/js/buttons.print.min.js"></script>
+<script src="assets/plotly-binding-4.10.4/plotly.js"></script>
+<script src="assets/typedarray-0.1/typedarray.min.js"></script>
+<link href="assets/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="assets/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="lib/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="lib/css/style.css" type="text/css" />
+<link rel="stylesheet" href="lib/css/lesson.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Multi-Asset Portfolio Strategy</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>多资产策略主页 MAS Homepage</a></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html"><i class="fa fa-check"></i>快速索引 Quick Table of Contents</a>
+<ul>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#diamondsuit-全球多资产策略-into-on-global-multi-asset-strategy"><i class="fa fa-check"></i><span class="math inline">\(\diamondsuit\)</span> 全球多资产策略 Into on Global Multi-asset Strategy</a></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#diamondsuit-选股模型-stock-selection-model"><i class="fa fa-check"></i><span class="math inline">\(\diamondsuit\)</span> 选股模型 Stock Selection Model</a>
+<ul>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#基础模型技术指标选股工具-the-base-model-a-technical-signaling-tool-for-stock-selection"><i class="fa fa-check"></i><span style="color:blue">基础模型：技术指标选股工具 The Base Model: a Technical Signaling Tool for Stock Selection</span></a></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#完整模型基于量化指标的全面选股工具-the-complete-model-a-comprehensive-stock-selection-model-using-quantitative-indicators"><i class="fa fa-check"></i><span style="color:blue">完整模型：基于量化指标的全面选股工具 The Complete Model: a Comprehensive Stock Selection Model: Using Quantitative Indicators</span></a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#diamondsuit-其他资产量化模型-quantitative-model-for-other-assets"><i class="fa fa-check"></i><span class="math inline">\(\diamondsuit\)</span> 其他资产量化模型 Quantitative Model for other Assets</a></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#diamondsuit-资产配置量化模型-asset-allocation-strategy-using-quantitative-models"><i class="fa fa-check"></i><span class="math inline">\(\diamondsuit\)</span> 资产配置量化模型 Asset Allocation Strategy Using Quantitative Models</a></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#diamondsuit-组合风险控制和优化-portfolio-risk-management-optimization"><i class="fa fa-check"></i><span class="math inline">\(\diamondsuit\)</span> 组合风险控制和优化 Portfolio Risk Management &amp; Optimization</a></li>
+<li class="chapter" data-level="" data-path="00_Quick-Table-of-Contents.html"><a href="00_Quick-Table-of-Contents.html#diamondsuit-附录-appendix"><i class="fa fa-check"></i><span class="math inline">\(\diamondsuit\)</span> 附录 Appendix</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="00_Multi-asset-Investment-Strategy.html"><a href="00_Multi-asset-Investment-Strategy.html"><i class="fa fa-check"></i>全球多资产策略 Into on Global Multi-asset Strategy</a>
+<ul>
+<li class="chapter" data-level="" data-path="00_Multi-asset-Investment-Strategy.html"><a href="00_Multi-asset-Investment-Strategy.html#全球战略资产配置策略-global-tactical-asset-allocation-strategy-gtaa"><i class="fa fa-check"></i>全球战略资产配置策略 Global Tactical Asset Allocation Strategy (GTAA)</a></li>
+<li class="chapter" data-level="" data-path="00_Multi-asset-Investment-Strategy.html"><a href="00_Multi-asset-Investment-Strategy.html#投资策略-gtaa-investment-strategy"><i class="fa fa-check"></i>投资策略 GTAA Investment Strategy</a></li>
+<li class="chapter" data-level="" data-path="00_Multi-asset-Investment-Strategy.html"><a href="00_Multi-asset-Investment-Strategy.html#投资范围与建立组合-investment-scope-portfolio-construction"><i class="fa fa-check"></i>投资范围与建立组合 Investment Scope &amp; Portfolio Construction</a></li>
+<li class="chapter" data-level="" data-path="00_Multi-asset-Investment-Strategy.html"><a href="00_Multi-asset-Investment-Strategy.html#投研流程-investment-research-process"><i class="fa fa-check"></i>投研流程 Investment &amp; Research Process</a></li>
+<li class="chapter" data-level="" data-path="00_Multi-asset-Investment-Strategy.html"><a href="00_Multi-asset-Investment-Strategy.html#风险管理-risk-management"><i class="fa fa-check"></i>风险管理 Risk Management</a></li>
+</ul></li>
+<li class="part"><span><b>I 第一部分-量化选股策略模型</b></span></li>
+<li class="chapter" data-level="" data-path="01_Stock_Model_Cover.html"><a href="01_Stock_Model_Cover.html"><i class="fa fa-check"></i>量化选股策略模型</a></li>
+<li class="chapter" data-level="1" data-path="01_Investment-Strategy-Outlook.html"><a href="01_Investment-Strategy-Outlook.html"><i class="fa fa-check"></i><b>1</b> 投资策略及模型规划 Investment Strategy Outlook</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="01_Investment-Strategy-Outlook.html"><a href="01_Investment-Strategy-Outlook.html#研究目标-research-objectives"><i class="fa fa-check"></i><b>1.1</b> 研究目标 Research Objectives</a></li>
+<li class="chapter" data-level="1.2" data-path="01_Investment-Strategy-Outlook.html"><a href="01_Investment-Strategy-Outlook.html#投资策略的思考-considerations-on-investment-strategy"><i class="fa fa-check"></i><b>1.2</b> 投资策略的思考 Considerations on Investment Strategy</a></li>
+<li class="chapter" data-level="1.3" data-path="01_Investment-Strategy-Outlook.html"><a href="01_Investment-Strategy-Outlook.html#模型设计的思考-considerations-on-model-designs"><i class="fa fa-check"></i><b>1.3</b> 模型设计的思考 Considerations on Model Designs</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="01a_Base_Model_Cover.html"><a href="01a_Base_Model_Cover.html"><i class="fa fa-check"></i>Part 1a: 基础选股模型：技术指标选股工具</a></li>
+<li class="chapter" data-level="2" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html"><i class="fa fa-check"></i><b>2</b> 基础模型搭建 (Base) Model Construction</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html#模型设计搭建概要-intro-on-base-model-design-and-construction"><i class="fa fa-check"></i><b>2.1</b> 模型设计搭建概要 Intro on (Base) Model Design and Construction</a></li>
+<li class="chapter" data-level="2.2" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html#其他组合相关过滤指标-portfolio-specific-subjective-indicators"><i class="fa fa-check"></i><b>2.2</b> 其他组合相关过滤指标 Portfolio-specific Subjective Indicators</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html#过滤指标1市值-subjective-indicator-no.1-market-cap-7-billion"><i class="fa fa-check"></i><b>2.2.1</b> <span style="color:blue">过滤指标1：市值 Subjective Indicator No.1: Market Cap &gt; $ 7 billion</span></a></li>
+<li class="chapter" data-level="2.2.2" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html#过滤指标2交易量-subjective-indicator-no.2-average-weekly-volume-1-million"><i class="fa fa-check"></i><b>2.2.2</b> <span style="color:blue">过滤指标2：交易量 Subjective Indicator No.2: Average Weekly Volume &gt; 1 million</span></a></li>
+<li class="chapter" data-level="2.2.3" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html#过滤指标3日股价变化-subjective-indicator-no.3-daily-return-nless--25"><i class="fa fa-check"></i><b>2.2.3</b> <span style="color:blue">过滤指标3：日股价变化 Subjective Indicator No.3: Daily Return <span class="math inline">\(\nless -25\%\)</span></span></a></li>
+<li class="chapter" data-level="2.2.4" data-path="02_Base-Model-Construction.html"><a href="02_Base-Model-Construction.html#过滤指标4波动率-subjective-indicator-no.4-annualized-volatility-ngtr-250"><i class="fa fa-check"></i><b>2.2.4</b> <span style="color:blue">过滤指标4：波动率 Subjective Indicator No.4: Annualized volatility <span class="math inline">\(\ngtr 250\%\)</span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="03_0_Technical-Indicators-Construction.html"><a href="03_0_Technical-Indicators-Construction.html"><i class="fa fa-check"></i><b>3</b> 技术指标搭建 Technical Indicators Construction</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="03_a_SMA.html"><a href="03_a_SMA.html"><i class="fa fa-check"></i><b>3.1</b> <span style="color:blue">技术指标1：简单移动平均线 Technical Indicator 1: Simple Moving Average (SMA)</span></a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="03_a_SMA.html"><a href="03_a_SMA.html#sma简介-intro--sma"><i class="fa fa-check"></i><b>3.1.1</b> <strong>SMA</strong>简介 Intro- <strong>SMA</strong>:</a></li>
+<li class="chapter" data-level="3.1.2" data-path="03_a_SMA.html"><a href="03_a_SMA.html#交易信号与策略--sma-trading-signals-strategies--sma"><i class="fa fa-check"></i><b>3.1.2</b> 交易信号与策略- <strong>SMA</strong> Trading signal(s) &amp; strategies- <strong>SMA</strong>:</a></li>
+<li class="chapter" data-level="3.1.3" data-path="03_a_SMA.html"><a href="03_a_SMA.html#sma策略交易信号汇总-to-summarize-for-sma-trading-signals"><i class="fa fa-check"></i><b>3.1.3</b> <strong>SMA</strong>策略交易信号汇总 To summarize for <strong>SMA</strong> trading signals:</a></li>
+<li class="chapter" data-level="3.1.4" data-path="03_a_SMA.html"><a href="03_a_SMA.html#sma总结-summary--sma"><i class="fa fa-check"></i><b>3.1.4</b> <strong>SMA</strong>总结 Summary- <strong>SMA</strong>:</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="03_b_EMA.html"><a href="03_b_EMA.html"><i class="fa fa-check"></i><b>3.2</b> <span style="color:blue">技术指标2：指数移动平均线 Technical Indicator 2: Exponential Moving Average (EMA)</span></a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="03_b_EMA.html"><a href="03_b_EMA.html#ema简介-intro--ema"><i class="fa fa-check"></i><b>3.2.1</b> <strong>EMA</strong>简介 Intro- <strong>EMA</strong>:</a></li>
+<li class="chapter" data-level="3.2.2" data-path="03_b_EMA.html"><a href="03_b_EMA.html#交易信号与策略--ema-trading-signals-strategies--ema"><i class="fa fa-check"></i><b>3.2.2</b> 交易信号与策略- <strong>EMA</strong> Trading signal(s) &amp; strategies- <strong>EMA</strong>:</a></li>
+<li class="chapter" data-level="3.2.3" data-path="03_b_EMA.html"><a href="03_b_EMA.html#ema策略交易信号汇总-to-summarize-for-ema-trading-signals"><i class="fa fa-check"></i><b>3.2.3</b> <strong>EMA</strong>策略交易信号汇总 To summarize for <strong>EMA</strong> trading signals:</a></li>
+<li class="chapter" data-level="3.2.4" data-path="03_b_EMA.html"><a href="03_b_EMA.html#ema总结-summary--ema"><i class="fa fa-check"></i><b>3.2.4</b> <strong>EMA</strong>总结 Summary- <strong>EMA</strong>:</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="03_c_MACD.html"><a href="03_c_MACD.html"><i class="fa fa-check"></i><b>3.3</b> <span style="color:blue">技术指标3：指数平滑移动平均线 Technical Indicator 3: Moving Average Convergence Divergence (MACD)</span></a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="03_c_MACD.html"><a href="03_c_MACD.html#macd简介-intro--macd"><i class="fa fa-check"></i><b>3.3.1</b> <strong>MACD</strong>简介 Intro- <strong>MACD</strong>:</a></li>
+<li class="chapter" data-level="3.3.2" data-path="03_c_MACD.html"><a href="03_c_MACD.html#交易信号与策略--macd-trading-signals-strategies--macd"><i class="fa fa-check"></i><b>3.3.2</b> 交易信号与策略- <strong>MACD</strong> Trading signal(s) &amp; strategies- <strong>MACD</strong>:</a></li>
+<li class="chapter" data-level="3.3.3" data-path="03_c_MACD.html"><a href="03_c_MACD.html#macd策略交易信号汇总-to-summarize-for-macd-trading-signals"><i class="fa fa-check"></i><b>3.3.3</b> <strong>MACD</strong>策略交易信号汇总 To summarize for <strong>MACD</strong> trading signals:</a></li>
+<li class="chapter" data-level="3.3.4" data-path="03_c_MACD.html"><a href="03_c_MACD.html#macd总结-summary--macd"><i class="fa fa-check"></i><b>3.3.4</b> <strong>MACD</strong>总结 Summary- <strong>MACD</strong>:</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="03_d_RSI.html"><a href="03_d_RSI.html"><i class="fa fa-check"></i><b>3.4</b> <span style="color:blue">技术指标4：相对强弱指数 Technical Indicator 4: Relative Strength Index (RSI)</span></a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="03_d_RSI.html"><a href="03_d_RSI.html#rsi简介-intro--rsi"><i class="fa fa-check"></i><b>3.4.1</b> <strong>RSI</strong>简介 Intro- <strong>RSI</strong>:</a></li>
+<li class="chapter" data-level="3.4.2" data-path="03_d_RSI.html"><a href="03_d_RSI.html#交易信号与策略--rsi-trading-signals-strategies--rsi"><i class="fa fa-check"></i><b>3.4.2</b> 交易信号与策略- <strong>RSI</strong> Trading signal(s) &amp; strategies- <strong>RSI</strong>:</a></li>
+<li class="chapter" data-level="3.4.3" data-path="03_d_RSI.html"><a href="03_d_RSI.html#rsi策略交易信号汇总-to-summarize-for-rsi-trading-signals"><i class="fa fa-check"></i><b>3.4.3</b> <strong>RSI</strong>策略交易信号汇总 To summarize for <strong>RSI</strong> trading signals:</a></li>
+<li class="chapter" data-level="3.4.4" data-path="03_d_RSI.html"><a href="03_d_RSI.html#rsi总结-summary--rsi"><i class="fa fa-check"></i><b>3.4.4</b> <strong>RSI</strong>总结 Summary- <strong>RSI</strong>:</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="03_e_BB.html"><a href="03_e_BB.html"><i class="fa fa-check"></i><b>3.5</b> <span style="color:blue">技术指标5：布林带 Technical Indicator 5: Bollinger Bands (BBands)</span></a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="03_e_BB.html"><a href="03_e_BB.html#bbands简介-intro--bbands"><i class="fa fa-check"></i><b>3.5.1</b> <strong>BBands</strong>简介 Intro- <strong>BBands</strong>:</a></li>
+<li class="chapter" data-level="3.5.2" data-path="03_e_BB.html"><a href="03_e_BB.html#交易信号与策略--bbands-trading-signals-strategies--bbands"><i class="fa fa-check"></i><b>3.5.2</b> 交易信号与策略- <strong>BBands</strong> Trading signal(s) &amp; strategies- <strong>BBands</strong>:</a></li>
+<li class="chapter" data-level="3.5.3" data-path="03_e_BB.html"><a href="03_e_BB.html#bbands策略交易信号汇总-to-summarize-for-bbands-trading-signals"><i class="fa fa-check"></i><b>3.5.3</b> <strong>BBands</strong>策略交易信号汇总 To summarize for <strong>BBands</strong> trading signals:</a></li>
+<li class="chapter" data-level="3.5.4" data-path="03_e_BB.html"><a href="03_e_BB.html#bbands总结-summary--bbands"><i class="fa fa-check"></i><b>3.5.4</b> <strong>BBands</strong>总结 Summary- <strong>BBands</strong>:</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="03_g_MOM.html"><a href="03_g_MOM.html"><i class="fa fa-check"></i><b>3.6</b> <span style="color:blue">技术指标7：动量 Technical Indicator 7: Momentum (MOM)</span></a></li>
+<li class="chapter" data-level="3.7" data-path="03_h_CCI.html"><a href="03_h_CCI.html"><i class="fa fa-check"></i><b>3.7</b> <span style="color:blue">技术指标8：商品频道指数 Technical Indicator 8: Commodity Channel Index (CCI)</span></a></li>
+<li class="chapter" data-level="3.8" data-path="03_i_CMO.html"><a href="03_i_CMO.html"><i class="fa fa-check"></i><b>3.8</b> <span style="color:blue">技术指标9：动量振荡器 Technical Indicator 9: Chande Momentum Oscillator (CMO)</span></a></li>
+<li class="chapter" data-level="3.9" data-path="03_j_MFI.html"><a href="03_j_MFI.html"><i class="fa fa-check"></i><b>3.9</b> <span style="color:blue">技术指标10：资金流量指数 Technical Indicator 10: Money Flow Index (MFI)</span></a></li>
+<li class="chapter" data-level="3.10" data-path="03_k_OBV.html"><a href="03_k_OBV.html"><i class="fa fa-check"></i><b>3.10</b> <span style="color:blue">技术指标11：能量潮 Technical Indicator 11: On Balance Volume (OBV)</span></a></li>
+<li class="chapter" data-level="3.11" data-path="03_l_CMF.html"><a href="03_l_CMF.html"><i class="fa fa-check"></i><b>3.11</b> <span style="color:blue">技术指标12：资金流量 Technical Indicator 12: Chaikin Money Flow (CMF)</span></a></li>
+<li class="chapter" data-level="3.12" data-path="03_m_PVT.html"><a href="03_m_PVT.html"><i class="fa fa-check"></i><b>3.12</b> <span style="color:blue">技术指标13：成交量趋势 Technical Indicator 13: Price Volume Trend (PVT)</span></a></li>
+<li class="chapter" data-level="3.13" data-path="03_n_KC.html"><a href="03_n_KC.html"><i class="fa fa-check"></i><b>3.13</b> <span style="color:blue">技术指标14：凯尔特纳通道 Technical Indicator 14: Keltner Channels (KC)</span></a></li>
+<li class="chapter" data-level="3.14" data-path="03_o_Donchian.html"><a href="03_o_Donchian.html"><i class="fa fa-check"></i><b>3.14</b> <span style="color:blue">技术指标15：唐奇安通道 Technical Indicator 15: Donchian Channel (Donchian)</span></a></li>
+<li class="chapter" data-level="3.15" data-path="03_p_TRATR.html"><a href="03_p_TRATR.html"><i class="fa fa-check"></i><b>3.15</b> <span style="color:blue">技术指标16：真实范围/平均真实波幅 Technical Indicator 16: True Range / Average True Range (TR/ATR)</span></a></li>
+<li class="chapter" data-level="3.16" data-path="03_q_VHF.html"><a href="03_q_VHF.html"><i class="fa fa-check"></i><b>3.16</b> <span style="color:blue">技术指标17：垂直水平过滤器 Technical Indicator 17: Vertical Horizontal Filter (VHF)</span></a></li>
+<li class="chapter" data-level="3.17" data-path="03_r_DPO.html"><a href="03_r_DPO.html"><i class="fa fa-check"></i><b>3.17</b> <span style="color:blue">技术指标18：去趋势价格振荡器 Technical Indicator 18: De-Trended Price Oscillator (DPO)</span></a></li>
+<li class="chapter" data-level="3.18" data-path="03_s_ADX.html"><a href="03_s_ADX.html"><i class="fa fa-check"></i><b>3.18</b> <span style="color:blue">技术指标19：平均方向性指标 Technical Indicator 19: Welles Wilder’s Directional Movement Index (ADX)</span></a></li>
+<li class="chapter" data-level="3.19" data-path="03_t_AROON.html"><a href="03_t_AROON.html"><i class="fa fa-check"></i><b>3.19</b> <span style="color:blue">技术指标20：阿隆振荡指标 Technical Indicator 20: Aroon &amp; Aroon Oscillator (AROON)</span></a></li>
+<li class="chapter" data-level="3.20" data-path="03_u_TRIX.html"><a href="03_u_TRIX.html"><i class="fa fa-check"></i><b>3.20</b> <span style="color:blue">技术指标21：三重指数平滑平均线 Technical Indicator 21: Triple Smoothed Exponential Oscillator (TRIX)</span></a></li>
+<li class="chapter" data-level="3.21" data-path="03_v_TSI.html"><a href="03_v_TSI.html"><i class="fa fa-check"></i><b>3.21</b> <span style="color:blue">技术指标22：真实强度指数 Technical Indicator 22: True Strength Index (TSI)</span></a></li>
+<li class="chapter" data-level="3.22" data-path="03_w_STOCH.html"><a href="03_w_STOCH.html"><i class="fa fa-check"></i><b>3.22</b> <span style="color:blue">技术指标23：随机指标振荡器 Technical Indicator 23: Stochastic Oscillator (STOCH)</span></a></li>
+<li class="chapter" data-level="3.23" data-path="03_x_PVO.html"><a href="03_x_PVO.html"><i class="fa fa-check"></i><b>3.23</b> <span style="color:blue">技术指标24：百分比成交量振荡器 Technical Indicator 24: Percentage Volume Oscillator (PVO)</span></a></li>
+<li class="chapter" data-level="3.24" data-path="03_y_CTI.html"><a href="03_y_CTI.html"><i class="fa fa-check"></i><b>3.24</b> <span style="color:blue">技术指标25：相关性趋势指标 Technical Indicator 25: Correlation Trend Indicator (CTI)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html"><i class="fa fa-check"></i><b>4</b> 基础模型选股表现 (Base) Model Performance</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#选取有效的技术指标动态更新dynamic-selecting-effective-technical-indicators"><i class="fa fa-check"></i><b>4.1</b> 选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#技术指标股价趋势预测正确性-correctness-of-price-trend-prediction-by-the-technical-indicators"><i class="fa fa-check"></i><b>4.1.1</b> 技术指标股价趋势预测正确性 Correctness of Price Trend Prediction by the Technical Indicators</a></li>
+<li class="chapter" data-level="4.1.2" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#技术指标股价趋势预测准确率排名-price-trend-prediction-accuracy-and-rankings-for-daily-trading-signals-by-the-technical-indicators"><i class="fa fa-check"></i><b>4.1.2</b> 技术指标股价趋势预测准确率排名 Price Trend Prediction Accuracy and Rankings for Daily Trading Signals by the Technical Indicators</a></li>
+<li class="chapter" data-level="4.1.3" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#有效技术指标动态跟新-dynamic-effective-technical-indicators"><i class="fa fa-check"></i><b>4.1.3</b> 有效技术指标（动态跟新） Dynamic: Effective Technical Indicators</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#技术信号选股策略模型-model-illustration-stock-selection-using-technical-trade-signals"><i class="fa fa-check"></i><b>4.2</b> 技术信号选股策略模型 Model Illustration: Stock Selection Using Technical Trade Signals</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#other-model-construction-steps"><i class="fa fa-check"></i><b>4.2.1</b> Other Model Construction Steps</a></li>
+<li class="chapter" data-level="4.2.2" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#dynamic-stock-selection-results"><i class="fa fa-check"></i><b>4.2.2</b> Dynamic: Stock Selection Results</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#portfolio-simulation---back-test-for-base-model-strategy-组合回测模拟"><i class="fa fa-check"></i><b>4.3</b> Portfolio Simulation - Back-test for Base Model Strategy 组合回测模拟</a></li>
+<li class="chapter" data-level="4.4" data-path="04_Base-Model-Performance.html"><a href="04_Base-Model-Performance.html#model-drawbacks-risks-模型缺陷和风险"><i class="fa fa-check"></i><b>4.4</b> Model Drawbacks &amp; Risks 模型缺陷和风险</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="Full-Model-Construction.html"><a href="Full-Model-Construction.html"><i class="fa fa-check"></i><b>5</b> 完整模型设计及搭建 Full Model Construction</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="Full-Model-Construction.html"><a href="Full-Model-Construction.html#完整量价选股模型搭建及设计-intro-on-full-model-design-construction"><i class="fa fa-check"></i><b>5.1</b> 完整量价选股模型搭建及设计 Intro on Full Model Design &amp; Construction</a></li>
+<li class="chapter" data-level="5.2" data-path="Full-Model-Construction.html"><a href="Full-Model-Construction.html#选取有效的基本面因子-selecting-effective-fundamental-factors"><i class="fa fa-check"></i><b>5.2</b> 选取有效的基本面因子 Selecting Effective Fundamental Factors</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="Full-Model-Performance.html"><a href="Full-Model-Performance.html"><i class="fa fa-check"></i><b>6</b> 基本面选股策略模型的总结 Fundamental Stock Selection Summary</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="Full-Model-Performance.html"><a href="Full-Model-Performance.html#模型选股-stock-selection"><i class="fa fa-check"></i><b>6.1</b> 模型选股 Stock Selection</a></li>
+<li class="chapter" data-level="6.2" data-path="Full-Model-Performance.html"><a href="Full-Model-Performance.html#组合回测-portfolio-simulation-back-test"><i class="fa fa-check"></i><b>6.2</b> 组合回测 Portfolio Simulation (Back-test)</a></li>
+<li class="chapter" data-level="6.3" data-path="Full-Model-Performance.html"><a href="Full-Model-Performance.html#基础完整模型的比较-base-model-vs.-full-model-comparison"><i class="fa fa-check"></i><b>6.3</b> 基础&amp;完整模型的比较 Base Model vs. Full Model Comparison</a></li>
+<li class="chapter" data-level="6.4" data-path="Full-Model-Performance.html"><a href="Full-Model-Performance.html#模型和策略设计缺陷-model-strategy-drawbacks"><i class="fa fa-check"></i><b>6.4</b> 模型和策略设计缺陷 Model &amp; Strategy Drawbacks</a></li>
+<li class="chapter" data-level="6.5" data-path="Full-Model-Performance.html"><a href="Full-Model-Performance.html#利用组合因子优化选股模型-consideration-optimization-using-portfolio-performance-factors"><i class="fa fa-check"></i><b>6.5</b> 利用组合因子优化选股模型 Consideration: Optimization Using Portfolio Performance Factors</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="Stock-Selection-Strategy-Summary.html"><a href="Stock-Selection-Strategy-Summary.html"><i class="fa fa-check"></i><b>7</b> 选股策略模型总结 Stock Selection Strategy &amp; Model Summary</a></li>
+<li class="chapter" data-level="8" data-path="Asset-Allocation-Model.html"><a href="Asset-Allocation-Model.html"><i class="fa fa-check"></i><b>8</b> 资产配置量化模型 Asset Allocation Strategy Using Quantitative Models</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="Asset-Allocation-Model.html"><a href="Asset-Allocation-Model.html#dynamic-asset-allocation-model---a-quant-tool-to-optimize-portfolio-performance-rm"><i class="fa fa-check"></i><b>8.1</b> Dynamic Asset Allocation Model - A Quant tool to Optimize Portfolio Performance &amp; RM</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="Quant-Model-Other-Asset-Class.html"><a href="Quant-Model-Other-Asset-Class.html"><i class="fa fa-check"></i><b>9</b> 其他多资产类别量化模型 Quantitative Model for other Assets</a></li>
+<li class="chapter" data-level="10" data-path="Risk-Disclosure.html"><a href="Risk-Disclosure.html"><i class="fa fa-check"></i><b>10</b> 风险披露 Risk Disclosure</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="Risk-Disclosure.html"><a href="Risk-Disclosure.html#risks-equities"><i class="fa fa-check"></i><b>10.1</b> Risks: Equities</a></li>
+<li class="chapter" data-level="10.2" data-path="Risk-Disclosure.html"><a href="Risk-Disclosure.html#risks-other-asset-classes"><i class="fa fa-check"></i><b>10.2</b> Risks: Other Asset Classes</a></li>
+<li class="chapter" data-level="10.3" data-path="Risk-Disclosure.html"><a href="Risk-Disclosure.html#portfolio-risks"><i class="fa fa-check"></i><b>10.3</b> Portfolio Risks</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>11</b> 附录 Appendix</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">全球多资产策略量化模型 </br> Global Multi-asset Investment Strategy</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="技术指标14凯尔特纳通道-technical-indicator-14-keltner-channels-kc" class="section level2 hasAnchor" number="3.13">
+<h2><span class="header-section-number">3.13</span> <span style="color:blue">技术指标14：凯尔特纳通道 Technical Indicator 14: Keltner Channels (KC)</span><a href="03_n_KC.html#技术指标14凯尔特纳通道-technical-indicator-14-keltner-channels-kc" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span></p>
+<p><span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span></p>
+<p><code>In Progress</code></p>
+<div style="text-align: right;">
+<p><strong>返回目录 </strong><a href="00_Quick-Table-of-Contents.html#快速索引-quick-table-of-contents">快速索引 Quick Table of Contents</a></p>
+</div>
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;">
+
+</div>
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+<pre><code>内部资料，请勿外传! 
+
+Internal documents, please do not disseminate! 
+
+本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+The web-based Quantitative Model e-Manual and web application are for information
+purposes only. The information and opinion contained and expressed herein, shall not,
+and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+representation of any kind or form whatsoever to buy or sell any security, financial
+instrument or any investment or other specific product.</code></pre>
+</div>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="03_m_PVT.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="03_o_Donchian.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihuahuang1/mas_public/edit/master/03_n_KC.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["series.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
