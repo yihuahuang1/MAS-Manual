@@ -1,0 +1,4 @@
+## [技术指标16：真实范围/平均真实波幅 Technical Indicator 16: True Range / Average True Range (TR/ATR)]{style="color:blue"}
+
+
+`In Progress`

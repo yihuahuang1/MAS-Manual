@@ -1,0 +1,824 @@
+
+
+## <span style="color:blue">技术指标2：指数移动平均线 Technical Indicator 2: Exponential Moving Average (EMA)</span> 
+
+Includes `tsignal4`, `tsignal5`, and `tsignal6`
+
+包括交易信号 `tsignal4`, `tsignal5`, 以及 `tsignal6`  
+
+<div class="new-page"></div>
+
+
+### **EMA**简介 Intro- **EMA**: 
+
+
+```{r 302-98, message=FALSE, warning=FALSE, include=FALSE}
+# Define function to read another rmd file
+source_rmd <- function(file, local = FALSE, ...){
+  options(knitr.duplicate.label = 'allow')
+
+  tempR <- tempfile(tmpdir = ".", fileext = ".R")
+  on.exit(unlink(tempR))
+  knitr::purl(file, output=tempR, quiet = TRUE)
+
+  envir <- globalenv()
+  source(tempR, local = envir, ...)
+}
+```
+
+```{r 302-99, message=FALSE, warning=FALSE, include=FALSE}
+# Read in base model construction rmd to continue with 3.2
+source_rmd("03_Technical-Indicators-Construction.Rmd")
+```
+
+
+Similar to the **Simple Moving Average (SMA)** which tends to smooth out the price variations, and the average prices are calculated by dropping the oldest data point and adding the latest one in a rolling manner. Specifically, an n-day **Exponential Moving Average (EMA)**, or the **n-day EMA** prices refers to the **exponential average** of the stock prices (the model uses the *adjusted close* prices) for the past n consecutive trading days.  
+
+In contrast to the **SMA**, the **Exponential Moving Average (EMA)** use the smoothing factor $\beta$ to assign a weight to each data point.This method ensures that more recent prices are given greater weight because of the exponential decay formula (The weights can be calculated in various ways, such as linear or exponential).
+
+与**简单移动平均线（SMA）**类似，**指数移动平均线（EMA）**也旨在平滑价格波动，并通过滑动舍去最旧的数据点并添加最新数据点的方式来计算平均价格。n日**指数移动平均线（EMA）**或**n日EMA**价格指的是过去n个连续交易日的股票价格的指数平均值（模型使用*调整收盘价*）。
+
+与**SMA不同**，**指数移动平均线（EMA）**使用平滑因子$\beta$为每个数据点分配权重，因为使用了指数衰减公式进行分配，近期的价格被赋予了更大的权重（权重可以通过多种方式计算，如线性或指数）。
+
+Mathematically defined as: 数学上定义为：
+
+$$\begin{aligned}
+\text{EMA}_t(P,n)&=\beta P_{t}+\beta(1-\beta)P_{t-1}+\beta(1-\beta)^{2}P_{t-2}+... \\
+&= \beta P_{t}+(1-\beta)\text{EMA}_{t-1}
+\end{aligned}$$
+
+where the smoothing coefficient $\beta$ is usually defined as: 平滑因子$\beta$通常被定义为：
+
+$$\beta=\frac{2}{n+1} \in (0;1)$$
+
+The **EMA** uses the previous value of the EMA ($\text{EMA}_{t-1}$) in its calculation.
+This means the **EMA** includes all the price data within its current value. The smoothing coefficient ensures that the newest price data has the most impact on the moving averages and the oldest prices data has only a minimal impact.
+
+The program uses the formula above to compute the **Exponential Moving Average (EMA)** values for **all stocks** in the model with various parameter settings, and creates appropriate related visualizations. The **EMA**-based **daily trading signals** will then be constructed from the subjectively set trading rules.  
+
+**指数移动平均线（EMA）**在其计算中包括了前一个EMA值（$\text{EMA}_{t-1}$）。因此，**EMA**在其当前值中包含了了所有过去的价格数据（信息）。平滑系数的使用确保了最新的价格数据对移动平均值有最大的影响，而最旧的价格数据对平均值的影响也被最小化。
+
+选股模型程序使用上述公式计算模型中**所有股票**的在多个不同的参数设定下的**指数移动平均线（EMA）**值，并创建相应的可视化图表。然后，根据主观设定的交易规则构建**EMA****日交易信号**。
+
+```{r 302-1, echo=FALSE, message=FALSE, warning=FALSE}
+# Define a function to compute the value for EMA using the adjusted close price with parameter settings of n days 
+
+EMA_comput <- function(price, n){
+  # Ensure ema has the same length as price and initially filled with NAs
+  ema <- rep(NA, length(price))
+
+  if (length(price) >= n) {  # Only compute EMA if enough data points are available
+    ema[n] <- mean(price[1:n])
+    beta <- 2 / (n + 1)
+
+    for (i in (n + 1):length(price)){
+      ema[i] <- beta * price[i] + (1 - beta) * ema[i - 1]
+    }
+  }
+
+  return(ema)
+}
+
+```
+
+```{r 302-2, message=FALSE, warning=FALSE, include=FALSE}
+# Compute EMA for all stocks, Full Data
+mega7data_modified <-
+  mega7data_modified %>%
+  group_by(symbol) %>%
+  mutate(EMA5 = EMA_comput(adjusted, 5), 
+         EMA8 = EMA_comput(adjusted,8),
+         EMA13 = EMA_comput(adjusted,13),
+         EMA20 = EMA_comput(adjusted,20),
+         EMA50 = EMA_comput(adjusted,50),
+         EMA200 = EMA_comput(adjusted,200))
+```
+
+```{r 302-3, message=FALSE, warning=FALSE, include=FALSE}
+# Alternative way: 
+# Below utilizes the `TTR` package directly for EMA computations: EMA()
+# AAPL <- xts(ema_value_result_pdf$adjusted,ema_value_result_pdf$date)
+# EMA200 <- EMA(AAPL,n = 200) 
+```
+
+```{r 302-4, message=FALSE, warning=FALSE, include=FALSE}
+ema_value_result <- 
+  mega7data_modified %>%
+  mutate(date = as.Date(date)) %>%
+  select(date, adjusted, EMA5, EMA8, EMA13, 
+         EMA20, EMA50, EMA200, volume) %>%
+  arrange(desc(date)) %>%
+  head(5000)
+
+ema_value_result_pdf <- 
+  mega7data_modified %>%
+  slice(which(symbol == "AAPL")) %>%
+  mutate(date = as.Date(date)) %>%
+  select(date, adjusted, EMA5, EMA8, EMA13, 
+         EMA20, EMA50, EMA200, volume) %>%
+  arrange(desc(date))
+```
+
+```{r 302-5, message=FALSE, warning=FALSE, include=FALSE}
+# ##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+# ##### [Individual stock outputs are suppressed, only `AAPL.US` related results are shown for illustration purposes. Refer to the *webapp* or the `html` version of the *e-Manual* for complete outputs. 个股输出数据及图表已隐藏，报告仅展示`苹果公司(AAPL.US)`的相关结果,完整图表可参阅*webapp* 或网页版*Global MAS 量化模型搭建说明*。]{style="color:red"} {-}
+
+# pdf output
+# Display AAPL output (EMA values)
+kbl(head(ema_value_result_pdf,10), booktabs = T, linesep = '', digits = 1,
+    caption = "EMA Computations for AAPL.US",
+    format.args = list(big.mark = ",", scientific = FALSE),
+    col.names = c("Symbol","Date","Adj Close","EMA5","EMA8",
+                  "EMA13","EMA20","EMA50","EMA200","Volume")) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(1,4:9), bold = T) %>%
+  kableExtra::footnote(general = "Output 3.2.a: Latest 10 rows of data are shown.")
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 302-6, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display EMA values
+DT::datatable(ema_value_result, 
+              colnames = c('Symbol' = 2, 'Date' = 3, 'Adjusted' = 4, 'Volume' = 11),
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'EMA Computations'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, style = list(width = '100%')), extensions = 'Buttons') %>%
+  formatRound(columns = c('Adjusted','EMA5','EMA8','EMA13','EMA20','EMA50','EMA200'),
+              digits = 2)  %>%
+  formatRound(columns = 'Volume', digits = 0)
+```
+
+Output 3.2.a: **EMA** Computations, latest 10 rows of data are shown.  
+
+图表 3.2.a: **EMA** 计算结果，展示最新的 10 行数据。
+
+</br>
+
+The program computed the **EMA** values for all stocks input in the model, with the parameter settings of $n=5,8,13,20,50,200$. As an illustration, above table shows the computed **EMA** values and plots (end of section). 
+
+模型程序为输入的所有股票计算了**EMA**值，参数设定为$n=5,8,13,20,50,200$。作为示例，上表展示了计算的**EMA**值并创建了可视化图表（节末）。
+
+```{r 302-7, message=FALSE, warning=FALSE, include=FALSE}
+# Data manipulation for EMA plot AAPL.US
+ema_aapl_xts <- 
+  mega7data_modified %>%
+  slice(which(symbol == "AAPL")) %>%
+  mutate(date = as.POSIXct(date)) %>%
+  select(date, open, high, low, close, volume, adjusted) %>%
+  na.omit()
+
+open <- ema_aapl_xts$open
+high <- ema_aapl_xts$high
+low <- ema_aapl_xts$low
+close <- ema_aapl_xts$close
+adjusted <- ema_aapl_xts$adjusted
+volume <- as.numeric(ema_aapl_xts$volume)
+
+ema_aapl_xts <- xts(cbind(open, high, low, close, volume, adjusted),
+                   as.POSIXct(ema_aapl_xts$date))
+ema_aapl_xts <- last(ema_aapl_xts,'365 days')
+```
+
+```{r 302-8, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+##### AAPL Plot include EMA5, EMA8, and EMA13 using `TTR` package {-}
+# pdf plot
+# EMA plot AAPL.US p.1 EMA5 EMA8 EMA13
+chartSeries(ema_aapl_xts,
+            type = "candlesticks",
+            theme = chartTheme('black'))
+
+addEMA(n = c(5, 8, 13), on = 1,
+       col = c("white","yellow", "purple"), overlay = TRUE)
+```
+
+```{r 302-9, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+##### AAPL Plot include EMA50, and EMA200
+# pdf plot
+# EMA plot TLSA.US p.2 SMA50 SMA200
+chartSeries(ema_aapl_xts,
+            type="candlesticks",
+            theme = chartTheme('black'))
+
+addEMA(n = c(50,200), on = 1,
+       col = c("grey","blue"), overlay = TRUE)
+```
+
+
+### 交易信号与策略- **EMA** Trading signal(s) & strategies- **EMA**:
+
+Typically, when the **Exponential Moving Average (EMA)** is on an upward trajectory and prices approach or slightly fall below the **EMA**, it suggests a potential buying opportunity. Conversely, when the **EMA** is declining and prices ascend towards or marginally exceed the **EMA**, it indicates a selling opportunity.
+
+In essence, when a short-run **EMA** crosses from below to above a longer-run **EMA** is an indication to **BUY**. When a short-run **EMA** crosses from above to below a longer-run **EMA** is an indication to **SELL**.    
+
+通常情况下，当**指数移动平均线（EMA）**呈上升趋势，而价格接近或略低于**EMA**时，它提示着一个买入机会。相反，当**EMA**下降且价格向**EMA**靠近或略高于**EMA**时，则可视为一个卖出机会。
+
+简而言之，当短期**EMA**从下方穿越至长期**EMA**的上方时，视为**买入**的信号。当短期**EMA**从上方穿越至长期**EMA**下方时，视为**卖出**的信号。  
+
+Moving averages are instrumental in identifying 'support and resistance areas'. Given that the **EMA** responds more promptly to price changes than the **Simple Moving Average (SMA)**, it can detect trends more swiftly. Thus, the **EMA** values and the ensuing trading signals are crucial for interpreting near-term price dynamics and identifying 'support and resistance areas'.
+
+An ascending **EMA** typically acts as a support level for price movements, whereas a descending **EMA** often serves as a resistance level. This principle underpins the strategy of buying close to a rising **EMA** and selling near a declining **EMA**.   
+
+移动平均线在提示“支撑和阻力区域”方面往往非常有效。鉴于**EMA**对价格变动的反应比**简单移动平均线（SMA）**更为敏感，能够比**SMA**更早地识别趋势变化；因此，**EMA**的值及其产生的交易信号在分析近期价格动向和“支撑与阻力区域”时变得更加重要。
+
+上升通道中的**EMA**往往可以视为价格的支撑，而下降的**EMA**往往对价格行为构成阻力。这也增强了当价格接近上升**EMA**时买入、价格接近下降**EMA**时卖出的这一策略。
+
+* 1. **EMA** Trading Signal #4: $\text{close price}>\text{EMA}(20)$ (Price relative to **EMA**) [`tsignal4`]     
+
+* 1. **EMA** 交易信号#4: $\text{收盘价}>\text{EMA}(20)$（价格相对于**EMA**）[`tsignal4`]
+
+When the most recent closing price (the model uses the *adjusted close* prices) is above its *EMA20* indicates a **BUY** signal, and vice versa for a **SELL** signal. We consider when $\text{close price}>\text{EMA}(20)$, the stock is currently trading at a strength relative to its recent (over a month) price history, otherwise the stock is currently trading weakly.  
+
+当最近的收盘价（模型使用*调整收盘价*）高于其*EMA20*时，视为一个**买入**的信号，反之亦然表示一个**卖出**信号。我们认为当$\text{收盘价}>\text{EMA}(20)$时，股票当前价格相较于其近期（超过一个月）的历史价格呈现出强势表现，反之当前交易价格呈现为弱势。
+
+
+* 2. **EMA** Trading Signal #5: $\text{EMA}(50)>\text{EMA}(200)$ (Hierarchical Moving Average Alignment) [`tsignal5`]  
+* 2. **EMA** 交易信号#5: $\text{EMA}(50)>\text{EMA}(200)$（层次化移动平均对齐）[`tsignal5`]
+
+Above mathematical expression is not completely accurate, where we believe when *EMA50* crosses from below to above a 200-day **Exponential Moving Average** (*EMA200*) indicates the stock prices are stable and established an uptrend trend, i.e. a **BUY** signal. When the *EMA50* crosses from above to below a *EMA200* indicates a **SELL** signal.  
+
+Note, this is the **EMA** version of the most classical **SMA** trading strategies, commonly refers to as the 'golden cross' and 'death cross'.
+
+上述数学表达式不完全准确，我们认为当*EMA50*从下方穿越至200日**指数移动平均线**(*EMA200*)上方时，表示股价相对稳定且处于上升通道，即视为一个**买入**信号。当*EMA50*从上方穿越至*EMA200*下方时，视为一个**卖出**信号。这是最经典的**SMA**交易策略之一的**EMA**版本，通常被称为“金叉”和“死叉”。
+
+* 3. **EMA** Trading Signal #6: $\text{EMA}(8)>\text{EMA}(13)$ & $\text{EMA}(5)>\text{EMA}(8)$ (Short-to-medium term Moving Average Alignment) [`tsignal6`]  
+* 3. **EMA** 交易信号#6: $\text{EMA}(8)>\text{EMA}(13)$ 且 $\text{EMA}(5)>\text{EMA}(8)$ （中短期移动平均对齐） [`tsignal6`]
+
+Above mathematical expression is not completely accurate either, where we believe when the *EMA8* crosses from below to above a 13-day **Exponential Moving Average** (*EMA13*) indicates the stock prices are in an upward trend for the medium term. If concurrently, the *EMA5* crosses from below to above a *EMA8*, which indicates the stock prices are in an upward trend for the short-to-medium term; a **BUY** opportunity is signaled.
+
+In contrast, when the *EMA8* crosses from above to below an *EMA13*, and concurrently the *EMA5* crosses from above to below the *EMA8*, indicates a **SELL** signal for the short-to-medium term.  
+
+Compare to the **SMA** version, this set of trading signals are more sensitive to price movements, as the **EMA** bears more weight on the more recent price variations, and the newest price data has the most impact.
+
+上述数学表达式可能未能完全阐述所有细节。我们认为，当*EMA8*从下方穿过13天**指数移动平均线**（*EMA13*）时，表示股票价格在中期内呈上升趋势。同时，如果*EMA5*从下方穿过*EMA8*，则表明股票价格在短至中期内处于上升趋势，这被视为一个买入机会。相反，当*EMA8*从上方穿越至*EMA13*下方，且*EMA5*同时从上方穿越至*EMA8*下方时，可被视为短至中期的卖出信号。
+
+与**SMA**相比，这一组**EMA**交易信号对价格的变动更为敏感。**EMA**更加注重近期的价格变化，因为其特性确保了最新的价格数据对平均数值具有最大的影响力。
+
+
+### **EMA**策略交易信号汇总 To summarize for **EMA** trading signals: 
+
+-   **EMA**- `tsignal4`:\
+    **BUY**: $\text{close price}>\text{EMA}(20)$,\
+    **SELL**: $\text{close price}\leq \text{EMA}(20)$;  
+
+- **EMA**交易信号- `tsignal4`:\
+    **买入**: $\text{收盘价}>\text{EMA}(20)$,\
+    **卖出**: $\text{收盘价}\leq \text{EMA}(20)$;
+
+-   **EMA**- `tsignal5`:\
+    **BUY**: $\text{EMA}(50)$ cross from **below to above** $\text{EMA}(200)$,\
+    **SELL**: $\text{EMA}(50)$ cross from **above to below** $\text{EMA}(200)$, \
+    **HOLD**: otherwise;  
+    
+- **EMA**交易信号- `tsignal5`:\
+    **买入**: $\text{EMA}(50)$ **从下方穿越至** $\text{EMA}(200)$**上方**,\
+    **卖出**: $\text{EMA}(50)$ **从上方穿越至** $\text{EMA}(200)$**下方**,\
+    **持有**: 其他情况;
+
+-   **EMA**- `tsignal6`:\
+    **BUY**: $\text{EMA}(8)$ cross from **below to above** a $\text{EMA}(13)$ **and** $\text{EMA}(5)$ cross from **below to above** a $\text{EMA}(8)$,\
+    **SELL**: $\text{EMA}(8)$ cross from **above to below** a $\text{EMA}(13)$ **and** $\text{EMA}(5)$ cross from **above to below** a $\text{EMA}(8)$, \
+    **HOLD**: otherwise.  
+    
+- **EMA**交易信号- `tsignal6`:\
+    **买入**: $\text{EMA}(8)$ **从下方穿越至** $\text{EMA}(13)$**上方并且** $\text{EMA}(5)$ **从下方穿越至** $\text{EMA}(8)$**上方**,\
+    **卖出**: $\text{EMA}(8)$ **从上方穿越至** $\text{EMA}(13)$**下方并且** $\text{EMA}(5)$ **从上方穿越至** $\text{EMA}(8)$**下方**,\
+    **持有**: 其他情况。
+
+```{r 302-10, message=FALSE, warning=FALSE, include=FALSE}
+# EMA Trading Signal 4: Price > EMA20
+# EMA Trading Rule setup and Generate Signals 
+mega7data_modified <-
+  mega7data_modified %>%
+  mutate(tsignal4 = case_when(EMA20 < adjusted ~ 'BUY',
+                              EMA20 >= adjusted ~ 'SELL'))
+```
+
+```{r 302-11, message=FALSE, warning=FALSE, include=FALSE}
+# EMA Trading Signal 5: EMA50 > EMA200
+# EMA Trading Rule setup and Generate Signals 
+mega7data_modified <- 
+  mega7data_modified %>%
+  group_by(symbol) %>%
+  mutate(tsignal5 = case_when(
+    lag(EMA50) < lag(EMA200) & EMA50 > EMA200 ~ 'BUY',
+    lag(EMA50) >= lag(EMA200) & EMA50 < EMA200 ~ 'SELL',
+    lag(EMA50) < lag(EMA200) & EMA50 <= EMA200 ~ 'HOLD',
+    lag(EMA50) >= lag(EMA200) & EMA50 >= EMA200 ~ 'HOLD'))
+```
+
+```{r 302-12, message=FALSE, warning=FALSE, include=FALSE}
+# EMA Trading Signal 6a: EMA5 > EMA8
+# EMA Trading Signal 6b: EMA8 > EMA13
+# EMA Trading Rule setup and Generate Signals 
+mega7data_modified <- 
+  mega7data_modified %>%
+  group_by(symbol) %>%
+  mutate(tsignal6a = case_when(
+    lag(EMA5) < lag(EMA8) & EMA5 > EMA8 ~ 'BUY',
+    lag(EMA5) >= lag(EMA8) & EMA5 < EMA8 ~ 'SELL',
+    lag(EMA5) < lag(EMA8) & EMA5 <= EMA8 ~ 'HOLD',
+    lag(EMA5) >= lag(EMA8) & EMA5 >= EMA8 ~ 'HOLD')) %>%
+  mutate(tsignal6b = case_when(
+    lag(EMA8) < lag(EMA13) & EMA8 > EMA13 ~ 'BUY',
+    lag(EMA8) >= lag(EMA13) & EMA8 < EMA13 ~ 'SELL',
+    lag(EMA8) < lag(EMA13) & EMA8 <= EMA13 ~ 'HOLD',
+    lag(EMA8) >= lag(EMA13) & EMA8 >= EMA13 ~ 'HOLD'))
+```
+
+```{r 302-13, message=FALSE, warning=FALSE, include=FALSE}
+# EMA Trading Signal 6: only when 6a & 6b are the SAME (simultaneously)
+# EMA Trading Rule setup and Generate Signals 
+mega7data_modified <- 
+  mega7data_modified %>%
+  mutate(tsignal6 = case_when(
+    tsignal6a == 'BUY' & tsignal6b == 'BUY' ~ 'BUY',
+    tsignal6a == 'BUY' & tsignal6b == 'SELL' ~ 'HOLD',
+    tsignal6a == 'BUY' & tsignal6b == 'HOLD' ~ 'HOLD',
+    tsignal6a == 'HOLD' & tsignal6b == 'HOLD' ~ 'HOLD',
+    tsignal6a == 'HOLD' & tsignal6b == 'BUY' ~ 'HOLD',
+    tsignal6a == 'HOLD' & tsignal6b == 'SELL' ~ 'HOLD',
+    tsignal6a == 'SELL' & tsignal6b == 'BUY' ~ 'HOLD',
+    tsignal6a == 'SELL' & tsignal6b == 'SELL' ~ 'SELL',
+    tsignal6a == 'SELL' & tsignal6b == 'HOLD' ~ 'HOLD')) 
+```
+
+```{r 302-14, message=FALSE, warning=FALSE, include=FALSE, paged.print=TRUE}
+# Prepare data frame EMA signal results
+ema_signal_result <-
+  mega7data_modified %>%
+  select(date, symbol, adjusted, tsignal4, tsignal5, 
+         tsignal6, tsignal6a, tsignal6b) %>%
+  arrange(desc(date)) %>%
+  head(5000)
+
+# For AAPL signals results (EMA)
+ema_signal_result_pdf <-
+  mega7data_modified %>%
+  slice(which(symbol == "AAPL")) %>%
+  ungroup() %>%
+  select(date, symbol, adjusted, tsignal4, tsignal5, 
+         tsignal6, tsignal6a, tsignal6b) %>%
+  arrange(desc(date)) %>%
+  head(10)
+```
+
+```{r 302-15, eval=FALSE, fig.pos='H', message=FALSE, warning=FALSE, include=FALSE}
+# ##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+# ##### [Individual stock outputs are suppressed, only `AAPL.US` related results are shown for illustration purposes. Refer to the *webapp* or the `html` version of the *e-Manual* for complete outputs. 个股输出数据及图表已隐藏，报告仅展示`苹果公司(AAPL.US)`的相关结果,完整图表可参阅*webapp* 或网页版*Global MAS 量化模型搭建说明*。]{style="color:red"} {-}
+
+# pdf output
+# Display AAPL signal results (EMA signals)
+kbl(ema_signal_result_pdf, booktabs = T, linesep = "", longtable = T, 
+    digits = 1, caption = "EMA Trading Signals for AAPL.US", 
+    format.args = list(big.mark = ",", scientific = FALSE),
+    col.names = c("Date","Symbol","Adj Close","tsignal4","tsignal5",
+                  "tsignal6","tsignal6a","tsignal6b")) %>%
+  kable_styling(latex_options = c("striped", "scale_up",
+                                  "HOLD_position"),
+                full_width = F) %>%
+  column_spec(c(2,4:6), bold = T) %>%
+  column_spec(1, width = "1.9cm") %>%
+  kableExtra::footnote(general = "Output 3.2.b: latest 10 rows of data are shown.",
+              number = "Includes tsignal4, tsignal5, tsignal6, tsignal6a and tsignal6b.")
+#图表3.2.b: EMA交易信号，展示最新的10行数据。包括`tsignal4`, `tsignal5`, `tsignal6`, #`tsignal6a`和`tsignal6b`。
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 302-16, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display EMA signal results 
+DT::datatable(ema_signal_result, 
+              colnames = c('Date' = 2, 'Symbol' = 3, 'Adjusted' = 4),
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'EMA Trading Signals'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, style = list(width = '100%')), extensions = 'Buttons') %>%
+    formatRound(columns = 'Adjusted', digits = 2)  
+```
+
+Output 3.2.b: **EMA** trading signals, latest 10 rows of data are shown. Includes `tsignal4`, `tsignal5`, `tsignal6`, `tsignal6a` and `tsignal6b`.  
+
+图表3.2.b: **EMA**交易信号，展示最新的10行数据。包括`tsignal4`, `tsignal5`, `tsignal6`, `tsignal6a`和`tsignal6b`。
+
+```{r 302-17, message=FALSE, warning=FALSE, include=FALSE}
+# pdf output
+# EMA Candlestick+Volume Plot for AAPL with trading signals
+# Prepare the dataset for candlestick components
+ema_signal_plot_pdf<- 
+  mega7data_modified %>%
+  slice(which(symbol == "AAPL")) %>%
+  select(date, symbol, adjusted, open, close, high, low, volume, EMA5, 
+         EMA8, EMA13, EMA20, EMA50, EMA200, tsignal4, tsignal5, tsignal6) %>%
+  mutate(date = as.Date(date, format = "%Y-%m-%d"),
+         day_trend_color = ifelse(open - adjusted > 0, "red", "green")) %>%
+  filter(as.Date(date) > as.Date(Sys.Date()-months(12)))
+```
+
+```{r 302-18, eval=FALSE, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, include=FALSE}
+# pdf output
+# EMA Candlestick+Volume Plot for AAPL with trading signals
+
+# Candlestick Plot with EMA Trading Signals
+color_values <- c(
+  "EMA5" = "black", 
+  "EMA8" = "yellow", 
+  "EMA13" = "purple", 
+  "EMA20" = "red", 
+  "EMA50" = "grey", 
+  "EMA200" = "blue",
+  "green" = "darkgreen", 
+  "red" = "red",
+  "Signal4 BUY " = "lightgreen", 
+  "Signal4 SELL" = "deeppink",
+  "Signal5 BUY" = "lightgreen", 
+  "Signal5 SELL" = "deeppink",
+  "Signal6 BUY" = "lightgreen", 
+  "Signal6 SELL" = "deeppink"
+)
+
+candlestick <- 
+  ggplot(ema_signal_plot_pdf, aes(x = date)) +
+  geom_segment(aes(xend = date, y = open, 
+                   yend = adjusted, colour = day_trend_color), size = 5) +
+  geom_segment(aes(xend = date, y = high, 
+                   yend = low, colour = day_trend_color)) +
+  geom_line(aes(y = EMA5, color = "EMA5"), size = 0.5) +
+  geom_line(aes(y = EMA8, color = "EMA8"), size = 0.5) +
+  geom_line(aes(y = EMA13, color = "EMA13"), size = 0.5) +
+  geom_line(aes(y = EMA20, color = "EMA20"), size = 0.5) +
+  geom_line(aes(y = EMA50, color = "EMA50"), size = 0.5) +
+  geom_line(aes(y = EMA200, color = "EMA200"), size = 0.5) +
+
+  # Adding trading signals with different shapes and colors
+  geom_point(data = filter(ema_signal_plot_pdf, tsignal4 == "BUY"),
+             aes(x = date, y = high, color = "Signal4 BUY", 
+                 shape = "Signal4 BUY"), size = 2) +
+  geom_point(data = filter(ema_signal_plot_pdf, tsignal4 == "SELL"), 
+             aes(x = date, y = low, color = "Signal4 SELL", 
+                 shape = "Signal4 SELL"), size = 2) +
+  geom_point(data = filter(ema_signal_plot_pdf, tsignal5 == "BUY"), 
+             aes(x = date, y = high, color = "Signal5 BUY", 
+                 shape = "Signal5 BUY"), size = 2) +
+  geom_point(data = filter(ema_signal_plot_pdf, tsignal5 == "SELL"), 
+             aes(x = date, y = low, color = "Signal5 SELL", 
+                 shape = "Signal5 SELL"), size = 2) +
+  geom_point(data = filter(ema_signal_plot_pdf, tsignal6 == "BUY"), 
+             aes(x = date, y = high, color = "Signal6 BUY", 
+                 shape = "Signal6 BUY"), size = 2) +
+  geom_point(data = filter(ema_signal_plot_pdf, tsignal6 == "SELL"), 
+             aes(x = date, y = low, color = "Signal6 SELL", 
+                 shape = "Signal6 SELL"), size = 2) +
+  theme(legend.position = "top",
+            guides(color = guide_legend(nrow = 4, byrow = TRUE, 
+                                title = "Indicators & Signals"), 
+    shape = guide_legend(nrow = 4, byrow = TRUE, title = "Trade Signals") 
+  )) +
+  scale_color_manual(name = "Indicators & Signals", values = color_values) +
+  scale_shape_manual(name = "Signal Shapes", 
+                     values = c("Signal4 BUY" = 17, "Signal4 SELL" = 4, 
+                                "Signal5 BUY" = 18, "Signal5 SELL" = 3, 
+                                "Signal6 BUY" = 15, "Signal6 SELL" = 1)) +
+  labs(
+    y = "Stock Price, in USD", x = "Date") +
+    labs(title = paste0("Price Volume Candlestick Plot for AAPL.US \
+       with EMA Lines and Trading Signals")) +
+  theme_bw() +
+  scale_x_date(date_breaks = "2 months", date_labels = "%b %Y")
+
+# Volume Plot
+volume_plot <- 
+  ggplot(ema_signal_plot_pdf, aes(x = date, y = volume, fill = day_trend_color)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("green" = "darkgreen", "red" = "red")) +
+  labs(y = "Daily Trading Volume", x = "Date") +
+  theme_bw() +
+  theme(legend.position = "none",
+            guides(color = guide_legend(nrow = 4, byrow = TRUE, 
+                                title = "Indicators & Signals"), 
+    shape = guide_legend(nrow = 4, byrow = TRUE, title = "Trade Signals") 
+  )) +
+  scale_x_date(date_breaks = "2 months", date_labels = "%b %Y") +
+  scale_y_continuous(labels = scales::comma)
+
+
+# Combine 2 plots
+ggarrange(candlestick, volume_plot, ncol = 1, nrow = 2,
+    heights =c(9,3), widths = 10, align = "v") 
+
+# Output 3.1.c: EMA plot with trading signals on Price and Volume, duration setting TTM.
+```
+
+```{r 302-19, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# plotly interactive plot
+# EMA Candlestick+Volume Plot for AAPL with trading signals
+# Prepare the dataset 
+
+ema_signal_plot_html<- 
+  mega7data_modified %>%
+  slice(which(symbol == "AAPL")) %>%
+  select(date, symbol, adjusted, open, close, high, low, volume, EMA5, 
+         EMA8, EMA13, EMA20, EMA50, EMA200, tsignal4, tsignal5, tsignal6) %>%
+  mutate(date = as.Date(date, format = "%Y-%m-%d"),
+         day_trend_color =  ifelse(open < adjusted, "lightgreen", "red"),
+         prev_volume = lag(volume),
+         prev_adjusted = lag(adjusted),
+         volume_color = ifelse(volume > prev_volume, "orange", "lightblue"),
+         hover_text_volume = paste(
+      "<b>Symbol:</b>", symbol, "<br>",
+      "<b>Date:</b>", format(date, '%Y-%m-%d'), "<br>",
+      "<b>Daily Volume:</b>", formatC(volume, big.mark = ","),
+      "<span style='color:", 
+      ifelse(volume > prev_volume, "darkgreen", "red"), ";'>",
+      ifelse(volume > prev_volume, "▲", "▼"), "</span>", "<br>")) %>% 
+ filter(as.Date(date) > as.Date(Sys.Date()-months(12)))
+
+# Define shapes for each signal
+signal_shapes <- list(
+  "Signal4 BUY" = "circle",
+  "Signal4 SELL" = "circle-open",
+  "Signal5 BUY" = "triangle-up",
+  "Signal5 SELL" = "triangle-down-open",
+  "Signal6 BUY" = "diamond",
+  "Signal6 SELL" = "diamond-open"
+)
+
+ema_signal_plot_html <- ema_signal_plot_html %>%
+  mutate(hover_text = paste(
+    "<b>Symbol:</b>", symbol, "<br>",
+    "<b>Date:</b>", format(date, '%Y-%m-%d'), "<br>",
+    "<b>Adjusted Close Price:</b> $", round(adjusted, 2), "<br>",
+    "<span style='color:", 
+    ifelse(adjusted > prev_adjusted, "darkgreen", "pink"), ";'>",
+      ifelse(adjusted > prev_adjusted, "▲", "▼"), "</span>", "<br>",
+    "<b>Open:</b> $", round(open, 2), "<br>",
+    "<b>High:</b> $", round(high, 2), "<br>",
+    "<b>Low:</b> $", round(low, 2), "<br>",
+    "<b>Volume:</b>", formatC(volume, format = "f", big.mark = ","),
+     "<span style='color:", 
+      ifelse(volume > prev_volume, "darkgreen", "red"), ";'>",
+      ifelse(volume > prev_volume, "▲", "▼"), "</span>", "<br>"
+  ))
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Individual stock outputs are suppressed, only `AAPL.US` related results are shown for illustration purposes. Refer to the *webapp* for the complete plot output. 个股输出数据及图表已隐藏，报告仅展示`苹果公司(AAPL.US)`的相关结果,完整图表可参阅*webapp*。]{style="color:red"} {-}
+
+```{r 302-20, echo=FALSE, fig.height=7, fig.width=12, message=FALSE, warning=FALSE}
+# html output
+# plotly interactive plot
+# EMA Price Candlestick Plot for AAPL with trading signals
+
+# Candlestick Plot with EMA Trading Signals
+fig <- plot_ly(data = ema_signal_plot_html, type = "candlestick", 
+               x = ~date, open = ~open, close = ~adjusted, high = ~high, low = ~low,
+               increasing = list(line = list(color = "darkgreen", width = 10), 
+                                 fillcolor = "darkgreen"),
+               decreasing = list(line = list(color = "red", width = 10), 
+                                 fillcolor = "red"), 
+               hoverinfo = "text", text = ~hover_text, showlegend = FALSE) %>%
+  add_lines(y = ~EMA5, name = "EMA5", line = list(color = "black"), showlegend = TRUE,
+            hoverinfo = "y+text", 
+            hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>EMA5:</b> %{y:.2f}<extra></extra>")) %>%
+  add_lines(y = ~EMA8, name = "EMA8", line = list(color = "yellow"),  showlegend = TRUE,
+            hoverinfo = "y+text", 
+            hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>EMA8:</b> %{y:.2f}<extra></extra>")) %>%
+  add_lines(y = ~EMA13, name = "EMA13", line = list(color = "purple"), showlegend = TRUE,
+            hoverinfo = "y+text", 
+            hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>EMA13:</b> %{y:.2f}<extra></extra>")) %>% 
+  add_lines(y = ~EMA20, name = "EMA20", line = list(color = "red"), showlegend = TRUE,
+            hoverinfo = "y+text", 
+            hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>EMA20:</b> %{y:.2f}<extra></extra>")) %>%
+  add_lines(y = ~EMA50, name = "EMA50", line = list(color = "grey"),  showlegend = TRUE,
+            hoverinfo = "y+text", 
+            hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>EMA50:</b> %{y:.2f}<extra></extra>")) %>%
+  add_lines(y = ~EMA200, name = "EMA200", line = list(color = "blue"), showlegend = TRUE,
+            hoverinfo = "y+text", 
+            hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>EMA200:</b> %{y:.2f}<extra></extra>")) %>%
+  add_markers(data = filter(ema_signal_plot_html, tsignal4 == "BUY"), 
+              x = ~date, y = ~high, 
+              marker = list(color = "lightgreen", size = 6,
+                            symbol = signal_shapes[["Signal4 BUY"]]), 
+              name = "Signal4 BUY", showlegend = TRUE,
+              hoverinfo = "text",
+              hovertemplate = 
+                "<b>Date:</b> %{x|%Y-%m-%d}<br><b>Signal4 BUY</b><extra></extra>") %>%
+  add_markers(data = filter(ema_signal_plot_html, tsignal4 == "SELL"), 
+              x = ~date, y = ~low, 
+              marker = list(color = "pink", size = 6,
+                            symbol = signal_shapes[["Signal4 SELL"]]), 
+              name = "Signal4 SELL", showlegend = TRUE,
+              hoverinfo = "text",
+              hovertemplate = 
+                "<b>Date:</b> %{x|%Y-%m-%d}<br><b>Signal4 SELL</b><extra></extra>") %>%
+  add_markers(data = filter(ema_signal_plot_html, tsignal5 == "BUY"), 
+              x = ~date, y = ~high, 
+              marker = list(color = "lightgreen", size = 6,
+                            symbol = signal_shapes[["Signal5 BUY"]]), 
+              name = "Signal5 BUY",  showlegend = TRUE,
+              hoverinfo = "text",
+              hovertemplate = 
+                "<b>Date:</b> %{x|%Y-%m-%d}<br><b>Signal5 BUY</b><extra></extra>") %>%
+  add_markers(data = filter(ema_signal_plot_html, tsignal5 == "SELL"), 
+              x = ~date, y = ~low, 
+              marker = list(color = "pink", size = 6,
+                            symbol = signal_shapes[["Signal5 SELL"]]), 
+              name = "Signal5 SELL", showlegend = TRUE,
+              hoverinfo = "text",
+              hovertemplate = 
+                "<b>Date:</b> %{x|%Y-%m-%d}<br><b>Signal5 SELL</b><extra></extra>") %>%
+  add_markers(data = filter(ema_signal_plot_html, tsignal6 == "BUY"), 
+              x = ~date, y = ~high, 
+              marker = list(color = "lightgreen", size = 6,
+                            symbol = signal_shapes[["Signal6 BUY"]]), 
+              name = "Signal6 BUY", showlegend = TRUE,
+              hoverinfo = "text",
+              hovertemplate = 
+                "<b>Date:</b> %{x|%Y-%m-%d}<br><b>Signal6 BUY</b><extra></extra>") %>%
+  add_markers(data = filter(ema_signal_plot_html, tsignal6 == "SELL"), 
+              x = ~date, y = ~low, 
+              marker = list(color = "pink", size = 6,
+                            symbol = signal_shapes[["Signal6 SELL"]]), 
+              name = "Signal6 SELL", showlegend = TRUE,
+              hoverinfo = "text",
+              hovertemplate = 
+                "<b>Date:</b> %{x|%Y-%m-%d}<br><b>Signal6 SELL</b><extra></extra>") %>%
+  layout(title = list(text = "Interactive Price Candlestick Plot for AAPL.US with EMA Lines and Trading Signals",
+                      x = 0.5,  
+                      y = 0.9,  
+                      xanchor = 'center',
+                      yanchor = 'top'),
+         xaxis = list(title = "Date", 
+                      type = "date", 
+                      rangeslider = list(visible = TRUE),
+                      rangeselector = list(
+                        buttons = list(
+                          list(count = 1, label = "1w", 
+                               step = "week", stepmode = "backward"),
+                          list(count = 2, label = "2w", 
+                               step = "week", stepmode = "backward"),
+                          list(count = 1, label = "1m", 
+                               step = "month", stepmode = "backward"),
+                          list(count = 6, label = "6m", 
+                               step = "month", stepmode = "backward"),
+                          list(count = 12, label = "TTM", 
+                               step = "month", stepmode = "backward"),
+                          list(count = 1, label = "YTD",
+                               step = "year", stepmode = "todate"),
+                          list(count = 1, label = "1y", 
+                               step = "year", stepmode = "backward"),
+                          list(step = "all")
+                      )
+                    )),
+         yaxis = list(title = "Stock Price, in USD", fixedrange = FALSE),
+         legend = list(orientation = "h",x = 0, y = -0.6, 
+                       xanchor = "left", yanchor = "top", traceorder = "normal"),
+         margin = list(t = 100, b = 200),
+         width = 800, height = 600)
+
+fig
+```
+
+Output 3.2.c: Interactive **EMA** plot with trading signals on Price, duration setting TTM.  
+
+图表 3.2.c: 交互式**EMA**股价图表，包括**EMA**策略交易信号，时间设置为TTM。
+
+##### [Individual stock outputs are suppressed, only `AAPL.US` related results are shown for illustration purposes. Refer to the *webapp* for the complete plot output. 个股输出数据及图表已隐藏，报告仅展示`苹果公司(AAPL.US)`的相关结果,完整图表可参阅*webapp*。]{style="color:red"} {-}
+
+```{r 302-21, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# plotly interactive plot
+# EMA Volume Plot for AAPL with trading signals
+# Define signal colors and shapes for trading signals
+
+volume_plot <- plot_ly(data = ema_signal_plot_html, 
+                       x = ~date, y = ~volume, type = 'bar', 
+                       marker = list(color = ~volume_color),
+                       hoverinfo = 'text', text = ~hover_text_volume,
+                       name = "Trading Volume") %>%
+  layout(title = list(text = "Interactive Daily Trading Volume Plot for AAPL.US \
+                      with EMA Lines and Trading Signals", 
+                      x = 0.5, y = 0.95, 
+                      xanchor = 'center', yanchor = 'top'),
+         xaxis = list(title = "Date", type = "date", rangeslider = list(visible = TRUE),
+                      rangeselector = list(
+                        buttons = list(
+                          list(count = 1, label = "1w", 
+                               step = "week", stepmode = "backward"),
+                          list(count = 2, label = "2w", 
+                               step = "week", stepmode = "backward"),
+                          list(count = 1, label = "1m", 
+                               step = "month", stepmode = "backward"),
+                          list(count = 6, label = "6m", 
+                               step = "month", stepmode = "backward"),
+                          list(count = 12, label = "TTM", 
+                               step = "month", stepmode = "backward"),
+                          list(count = 1, label = "YTD",
+                               step = "year", stepmode = "todate"),
+                          list(count = 1, label = "1y", 
+                               step = "year", stepmode = "backward"),
+                          list(step = "all")
+                      )
+                    )),
+         yaxis = list(title = "Daily Trading Volume", fixedrange = FALSE, side = "left"),
+         yaxis2 = list(title = "Daily EMA Values", 
+                       overlaying = "y", side = "right", 
+                       showgrid = FALSE,titlefont = list(size = 14)),
+         barmode = 'group',
+         legend = list(orientation = "h", x = 0.5, y = -0.4, 
+                       xanchor = "center", yanchor = "top"),
+         margin = list(l = 40, r = 40,b = 100, t = 100, pad = 4), height = 450)
+
+vol_signal_colors <- c("BUY" = "lightgreen", "SELL" = "pink")
+signals <- c("tsignal4", "tsignal5", "tsignal6")
+
+for (sig in signals) {
+  volume_plot <- volume_plot %>%
+    add_markers(data = ema_signal_plot_html %>% 
+                  filter(get(sig) == "BUY"), 
+                x = ~date, y = ~volume, 
+                marker = list(color = vol_signal_colors[["BUY"]], 
+                              size = 10, symbol = "circle"),
+                name = paste(sig, "BUY"),
+                hoverinfo = "text",
+                hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>", 
+                                      sig, "BUY</b><extra></extra>")) %>%
+    add_markers(data = ema_signal_plot_html %>% filter(get(sig) == "SELL"), 
+                x = ~date, y = ~volume, 
+                marker = list(color = vol_signal_colors[["SELL"]], 
+                              size = 10, symbol = "x"),
+                name = paste(sig, "SELL"),
+                hoverinfo = "text",
+                hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>", 
+                                      sig, "SELL</b><extra></extra>"))
+}
+
+ema_lines <- c("EMA5", "EMA8", "EMA13", "EMA20", "EMA50", "EMA200")
+
+ema_colors <- c("EMA5" = "black", "EMA8" = "yellow",
+                "EMA13" = "purple", "EMA20" = "red", 
+                "EMA50" = "grey", "EMA200" = "blue")
+
+for (ema in ema_lines) {
+  volume_plot <- 
+    volume_plot %>%
+    add_lines(data = ema_signal_plot_html, 
+          x = ~date, y = as.formula(paste0("~", ema)), name = ema, 
+              line = list(color = ema_colors[ema]), yaxis = "y2",
+              hoverinfo = "y+text", 
+              hovertemplate = paste("<b>Date:</b> %{x|%Y-%m-%d}<br><b>", 
+                                    ema, ":</b> %{y:.2f}<extra></extra>"))
+}
+
+volume_plot
+```
+
+Output 3.2.d: Interactive **EMA** plot with trading signals on Volume, duration setting TTM.  
+
+输出 3.2.d: 交互式**EMA**成交量图表，包括**EMA**策略交易信号，时间设置为TTM。
+
+### **EMA**总结 Summary- **EMA**:  
+
+The model adopts the same trading signal rules or indicator parameter settings for interpreting the **Exponential Moving Average (EMA)** as it does for the **Simple Moving Average (SMA)**. However, the **EMA** is typically more responsive to price movements than the **SMA**. On one hand, this responsiveness allows the **EMA** to signal trends earlier than the **SMA** might. On the other hand, the **EMA** is likely to reflect more short-term changes (price fluctuations) than a corresponding **SMA** would.
+
+All moving averages, including both the **SMA** and the **EMA**, are not crafted to pinpoint the precise bottoms and tops of price levels. Through the utilization of moving averages, the model aims to discern the general direction of market trends (upward, sideways/congested, downward), though analysts acknowledge that a delay in entry and exit points may occur due to the nature of the moving averages. Most critically, the **EMA** tends to have a shorter delay than the **SMA** for equivalent parameter settings.
+
+模型采用了与**简单移动平均线（SMA）**相同的交易信号规则或指标参数设定来解读**指数移动平均线（EMA）**。然而，相较于**SMA**，**EMA**对价格变动通常更敏感。一方面，这种敏感性使**EMA**能比**SMA**更早地提示趋势走向。另一方面，与相对应的**SMA**相比，**EMA**可能会反映出更多的短期变化（价格波动）。
+
+所有移动平均线，包括**SMA**和**EMA**，都不旨在精确识别价格水平的确切底部和顶部。通过使用移动平均线，模型旨在识别市场趋势的大致方向（向上、横向/盘整、向下），研究员们认识到由于移动平均线的数学特性，对于入场和出场时间点的识别可能会存在延迟。最关键的是，在相同的参数设置下，**EMA**比**SMA**的延迟更短。
+
+Besides the **SMA** and **EMA**, several other moving averages are commonly utilized, such as the **Weighted Moving Average (WMA)**, the **Double Exponential Moving Average (DEMA)**, and the **Triple Exponential Moving Average (TEMA)**. Most aim to smooth out price movements, making the technical indicators/trading signals less sensitive to short-term price fluctuations. Nonetheless, considering our investment needs to identify intra-day, short-term, and medium-to-longer-term equity investment opportunities, the model will primarily focus on the simple and exponential moving averages.   
+
+除了**SMA**和**EMA**之外，还有一些其他常用的移动平均线，如**加权移动平均线（WMA）**、**双重指数移动平均线（DEMA）**和**三重指数移动平均线（TEMA）**等。它们大多旨在平滑价格的变动，使技术指标/交易信号对短期股价波动的敏感度降低。然而，考虑到我们寻找和识别日内、短期和中长期股票投资机会的投资需求，此模型将主要关注简单和指数移动平均线。
+
+The program is now constructed to generate **daily trading signals** given by the **Exponential Moving Average (EMA)** indicator values. The latest applied parameter settings and trading rules for the **EMA**-generated signals are summarized above. 
+
+**Daily trading signals** from the **EMA** indicators, include `tsignal4`, `tsignal5` and `tsignal6` (combined from `tsignal6a` and `tsignal6b`), for all stocks are generated; and the results (data tables and plots) for `AAPL.US` are shown above as illustrations, refer to the *webapp* for the complete data tables and plots/visualizations outputs.
+
+根据**指数移动平均线（EMA）**指标值给出**每日交易信号**的模型程序现已构建完成。选股模型最新应用的指标参数设定和**EMA**策略生成的交易信号的相关分析和设定已在上述部分总结。
+
+**EMA**指标的**每日交易信号**，包括`tsignal4`,`tsignal5`和`tsignal6`（由`tsignal6a`和`tsignal6b`组合而成），且已经为模型中所有的股票生成**每日交易信号**；并且以`苹果公司(AAPL.US)`的结果（数据表和图表）作为示例展示，完整图表可参阅*webapp*。 
+
+$^*$ Whether the **EMA** indicator, or the trading signals `tsignal4`, `tsignal5` and `tsignal6` are effective in selecting stocks to construct a portfolio trading strategies with upsides, will be further analyzed by the model, and refer to **$\S 4.1$ ** [选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators] below for more details. 
+
+$^*$ **EMA**指标或策略交易信号`tsignal4`,`tsignal5`和`tsignal6`在组合交易策略中是否具备有效选择上升潜力股票的能力，将由选股模型进一步分析，详情参考**$\S 4.1$ ** [选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators]。
+
+
+

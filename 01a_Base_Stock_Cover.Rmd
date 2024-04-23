@@ -1,0 +1,116 @@
+# (PART) 第一部分 量化选股策略模型 {-}
+
+# Part One: 量化选股策略模型 MAS Part One {-}
+
+
+```{r eval=FALSE, include=FALSE}
+<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
+<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
+``` 
+
+<span style="color:black;font-weight:700;font-size:32px">量化选股策略模型 </span>   
+
+<span style="color:black;font-weight:700;font-size:31px">Stock Selection Strategy Using Quantitative Models </span>   
+
+</br>
+
+</br>
+
+```{r 1a, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::include_graphics("stock_home_1.png")
+```
+
+
+
+
+Quantitative Stock Selection Model:
+
+Technical Indicator Signals (Momentum + Price/Volume Strategy)  
+
+* Trend indicators: SMA, RSI, BB, SAR, ADOSC  
+
+* Volume indicators: OBV, Volume Oscillator, EMV, PVT, PVR, VP  
+
+* Other momentum technical indicators: Money Flow Index, Average True Range, Force Index, EFI, MACD, ADX, CCI  
+
+* Fundamental/Company-specific Signals (Fundamental Research + Quant Strategy)  
+
+* Analyst ratings  
+
+* Fundamental factors: EV/EBITDA, P/E, P/B, ROA, ROE, CR, Gross Margin, Earning Growth, etc.  
+
+* Global/Region Macros:
+
+Macro Analyst research  
+
+Indicators: GDP growth, QoQ CPI, employment, etc. 
+
+The essence of the MAS strategy is to enter or exit at potentially profitable moments: the inclusion of specific technical/fundamental/macro indicators/factors in our selection model depends on their effectiveness in generating upside returns.
+
+
+**量化选股模型：**
+
+**技术指标信号（动量 + 价格/成交量策略）** 
+
+趋势指标：SMA、RSI、BB、SAR、ADOSC  
+
+成交量指标：OBV、成交量振荡器、EMV、PVT、PVR、VP  
+
+其他动量技术指标：资金流指数、真实波幅均值、力量指数、EFI、MACD、ADX、CCI  
+
+**基本面/公司特定信号（基本面研究 + 定量策略）**  
+
+研究员评级
+
+基本面因子：EV/EBITDA、P/E、P/B、ROA、ROE、CR、毛利率、盈利增长等  
+
+**全球/地区宏观：**  
+
+宏观经济分析研究  
+
+指标：GDP增长、季度通胀率、就业等  
+
+MAS策略的本质是在潜在盈利时刻进入或退出：技术/基本面/宏观经济指标/因素的纳入我们的选股模型取决于其产生正收益的有效性。
+
+
+
+
+</br>
+
+</br>
+
+<div style="text-align: right;">
+**返回目录  **[快速索引 Quick Table of Contents] 
+</div>
+
+
+
+
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;"></div>
+
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+    内部资料，请勿外传! 
+
+    Internal documents, please do not disseminate! 
+
+    本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+    均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+    以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+    The web-based Quantitative Model e-Manual and web application are for information
+    purposes only. The information and opinion contained and expressed herein, shall not,
+    and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+    solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+    representation of any kind or form whatsoever to buy or sell any security, financial
+    instrument or any investment or other specific product.
+</div>
+
+
+
+
+
+
+
+

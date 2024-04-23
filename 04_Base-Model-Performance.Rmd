@@ -1,0 +1,1648 @@
+# 基础模型选股表现 (Base) Model Performance 
+
+```{r eval=FALSE, include=FALSE}
+<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
+<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
+```
+
+`In Progress`
+
+
+
+
+```{r 400-1, message=FALSE, warning=FALSE, include=FALSE}
+# Define function to read another rmd file
+source_rmd <- function(file, local = FALSE, ...){
+  options(knitr.duplicate.label = 'allow')
+
+  tempR <- tempfile(tmpdir = ".", fileext = ".R")
+  on.exit(unlink(tempR))
+  knitr::purl(file, output=tempR, quiet = TRUE)
+
+  envir <- globalenv()
+  source(tempR, local = envir, ...)
+}
+```
+
+```{r 400-2, message=FALSE, warning=FALSE, include=FALSE}
+# Read in tech indicators rmd to continue with 4.1
+source_rmd("03_e_BB.Rmd")
+```
+
+
+## 选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators 
+
+`In Progress`
+
+### 技术指标股价趋势预测正确性 Correctness of Price Trend Prediction by the Technical Indicators   
+
+```{r 401-1, message=FALSE, warning=FALSE, include=FALSE}
+mega7data_modified <- 
+  mega7data_modified %>%
+  group_by(symbol) %>%
+  mutate(max_price_next_5days = 
+           lead(rollapplyr(adjusted, width = 5, FUN = max, 
+                           align = "left",  partial = TRUE, fill = NA)),
+         min_price_next_5days = 
+           lead(rollapplyr(adjusted, width = 5, FUN = min, 
+                           align = "left",  partial = TRUE, fill = NA)),
+         price_up_5day = 
+           case_when(is.na(max_price_next_5days) ~ NA_character_,
+                     adjusted * 1.02 < max_price_next_5days ~ "YES",
+                     TRUE ~ "NO"),
+         price_down_5day = 
+           case_when(is.na(min_price_next_5days) ~ NA_character_,
+                     adjusted * 0.98 > min_price_next_5days ~ "YES",
+                     TRUE ~ "NO")) %>%
+  ungroup()
+```
+
+```{r 401-2, message=FALSE, warning=FALSE, include=FALSE}
+evaluate_signal_accuracy <- function(data) {
+  # Initialize vectors to store the evaluation results for each signal
+  result1 <- rep(NA, length(data$tsignal1))
+  result2 <- rep(NA, length(data$tsignal2))
+  result3 <- rep(NA, length(data$tsignal3))
+  result4 <- rep(NA, length(data$tsignal4))
+  result5 <- rep(NA, length(data$tsignal5))
+  result6 <- rep(NA, length(data$tsignal6))
+  result7 <- rep(NA, length(data$tsignal7))
+  result8 <- rep(NA, length(data$tsignal8))
+  result10 <- rep(NA, length(data$tsignal10))
+  result11 <- rep(NA, length(data$tsignal11))
+  result12 <- rep(NA, length(data$tsignal12))
+  result13 <- rep(NA, length(data$tsignal13))
+  result14 <- rep(NA, length(data$tsignal14))
+  result15a <- rep(NA, length(data$tsignal15a))
+  result15 <- rep(NA, length(data$tsignal15))
+
+  
+  for (i in seq_len(nrow(data))) {
+    # Access relevant data for the current row
+    signal1 <- data$tsignal1[i]
+    signal2 <- data$tsignal2[i]
+    signal3 <- data$tsignal3[i]
+    signal4 <- data$tsignal4[i]
+    signal5 <- data$tsignal5[i]
+    signal6 <- data$tsignal6[i]
+    signal7 <- data$tsignal7[i]
+    signal8 <- data$tsignal8[i]
+    signal10 <- data$tsignal10[i]
+    signal11 <- data$tsignal11[i]
+    signal12 <- data$tsignal12[i]
+    signal13 <- data$tsignal13[i]
+    signal14 <- data$tsignal14[i]
+    signal15a <- data$tsignal15a[i]
+    signal15 <- data$tsignal15[i]
+
+    price_up <- data$price_up_5day[i]
+    price_down <- data$price_down_5day[i]
+    
+    # Logic for evaluating signals 
+    result1[i] <- evaluate_signal(signal1, price_up, price_down)
+    result2[i] <- evaluate_signal(signal2, price_up, price_down)
+    result3[i] <- evaluate_signal(signal3, price_up, price_down)
+    result4[i] <- evaluate_signal(signal4, price_up, price_down)
+    result5[i] <- evaluate_signal(signal5, price_up, price_down)
+    result6[i] <- evaluate_signal(signal6, price_up, price_down)
+    result7[i] <- evaluate_signal(signal7, price_up, price_down)
+    result8[i] <- evaluate_signal(signal8, price_up, price_down)
+    result10[i] <- evaluate_signal(signal10, price_up, price_down)
+    result11[i] <- evaluate_signal(signal11, price_up, price_down)
+    result12[i] <- evaluate_signal(signal12, price_up, price_down)
+    result13[i] <- evaluate_signal(signal13, price_up, price_down)
+    result14[i] <- evaluate_signal(signal14, price_up, price_down)
+    result15a[i] <- evaluate_signal(signal15a, price_up, price_down)
+    result15[i] <- evaluate_signal(signal15, price_up, price_down)
+
+    
+  }
+  
+  # Combine results into a list for output
+  results <- list(trend_accuracy_tsignal1 = result1, 
+                  trend_accuracy_tsignal2 = result2, 
+                  trend_accuracy_tsignal3 = result3,
+                  trend_accuracy_tsignal4 = result4, 
+                  trend_accuracy_tsignal5 = result5, 
+                  trend_accuracy_tsignal6 = result6,
+                  trend_accuracy_tsignal7 = result7, 
+                  trend_accuracy_tsignal8 = result8, 
+                  trend_accuracy_tsignal10 = result10,
+                  trend_accuracy_tsignal11 = result11, 
+                  trend_accuracy_tsignal12 = result12, 
+                  trend_accuracy_tsignal13 = result13,
+                  trend_accuracy_tsignal14 = result14, 
+                  trend_accuracy_tsignal15a = result15a, 
+                  trend_accuracy_tsignal15 = result15
+                  )
+  return(results)
+}
+
+evaluate_signal <- function(signal, price_up, price_down) {
+  # Check for NA values explicitly in the inputs
+  if (is.na(signal) || is.na(price_up) || is.na(price_down)) {
+    return(NA)
+  }
+  
+  if (signal == "BUY" && price_up == "YES") {
+    return(TRUE)
+  } else if (signal == "SELL" && price_down == "YES") {
+    return(TRUE)
+  } else if (signal == "HOLD" && price_up == "NO" && price_down == "NO") {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+```
+
+```{r 401-3, message=FALSE, warning=FALSE, include=FALSE}
+# Mutate whether signal correctly predicts price trend for the coming 5 trading days
+signal_eval_results <- evaluate_signal_accuracy(mega7data_modified)
+
+mega7data_modified$correct_tsignal1 <- signal_eval_results$trend_accuracy_tsignal1
+mega7data_modified$correct_tsignal2 <- signal_eval_results$trend_accuracy_tsignal2
+mega7data_modified$correct_tsignal3 <- signal_eval_results$trend_accuracy_tsignal3
+mega7data_modified$correct_tsignal4 <- signal_eval_results$trend_accuracy_tsignal4
+mega7data_modified$correct_tsignal5 <- signal_eval_results$trend_accuracy_tsignal5
+mega7data_modified$correct_tsignal6 <- signal_eval_results$trend_accuracy_tsignal6
+mega7data_modified$correct_tsignal7 <- signal_eval_results$trend_accuracy_tsignal7
+mega7data_modified$correct_tsignal8 <- signal_eval_results$trend_accuracy_tsignal8
+mega7data_modified$correct_tsignal10 <- signal_eval_results$trend_accuracy_tsignal10
+mega7data_modified$correct_tsignal11 <- signal_eval_results$trend_accuracy_tsignal11
+mega7data_modified$correct_tsignal12 <- signal_eval_results$trend_accuracy_tsignal12
+mega7data_modified$correct_tsignal13 <- signal_eval_results$trend_accuracy_tsignal13
+mega7data_modified$correct_tsignal14 <- signal_eval_results$trend_accuracy_tsignal14
+mega7data_modified$correct_tsignal15a <- signal_eval_results$trend_accuracy_tsignal15a
+mega7data_modified$correct_tsignal15 <- signal_eval_results$trend_accuracy_tsignal15
+
+```
+
+```{r 401-4, message=FALSE, warning=FALSE, include=FALSE}
+tech_signal_html <- 
+  mega7data_modified %>%
+  mutate(date = as.Date(date)) %>%
+  select(date, symbol, adjusted, tsignal1, tsignal2, tsignal3, tsignal4, 
+         tsignal5, tsignal6,tsignal7, tsignal8, tsignal10, tsignal11,
+         tsignal12, tsignal13, tsignal14, tsignal15a,tsignal15) %>%
+  filter(as.Date(date) > as.Date(Sys.Date()-months(12))) %>%
+  rename('Date' = date,
+    'Symbol' = symbol,
+    'Adjusted' = adjusted,
+    'Tech Signal 1' = tsignal1,
+    'Tech Signal 2' = tsignal2,
+    'Tech Signal 3' = tsignal3,
+    'Tech Signal 4' = tsignal4,
+    'Tech Signal 5' = tsignal5,
+    'Tech Signal 6' = tsignal6,
+    'Tech Signal 7' = tsignal7,
+    'Tech Signal 8' = tsignal8,
+    'Tech Signal 10' = tsignal10,
+    'Tech Signal 11' = tsignal11,
+    'Tech Signal 12' = tsignal12,
+    'Tech Signal 13' = tsignal13,
+    'Tech Signal 14' = tsignal14,
+    'Tech Signal 15a' = tsignal15a,
+    'Tech Signal 15' = tsignal15) %>%
+  arrange(desc(Date)) %>%
+  head(5000)
+
+tech_signal_pdf <- 
+  tech_signal_html %>%
+  slice(which(Symbol == "AAPL")) 
+  
+tech_correctness_signal_html <- 
+  mega7data_modified %>%
+  mutate(date = as.Date(date)) %>%
+  select(date, symbol, adjusted, correct_tsignal1, correct_tsignal2, 
+         correct_tsignal3, correct_tsignal4,correct_tsignal5,correct_tsignal6,
+         correct_tsignal7, correct_tsignal8,correct_tsignal10,correct_tsignal11,
+         correct_tsignal12, correct_tsignal13,correct_tsignal14,correct_tsignal15a,
+         correct_tsignal15) %>%
+  filter(as.Date(date) > as.Date(Sys.Date()-months(12))) %>%
+  rename(
+    'Date' = date,
+    'Symbol' = symbol,
+    'Adjusted' = adjusted,
+    'Signal 1 Correctness' = correct_tsignal1,
+    'Signal 2 Correctness' = correct_tsignal2,
+    'Signal 3 Correctness' = correct_tsignal3,
+    'Signal 4 Correctness' = correct_tsignal4,
+    'Signal 5 Correctness' = correct_tsignal5,
+    'Signal 6 Correctness' = correct_tsignal6,
+    'Signal 7 Correctness' = correct_tsignal7,
+    'Signal 8 Correctness' = correct_tsignal8,
+    'Signal 10 Correctness' = correct_tsignal10,
+    'Signal 11 Correctness' = correct_tsignal11,
+    'Signal 12 Correctness' = correct_tsignal12, 
+    'Signal 13 Correctness' = correct_tsignal13,
+    'Signal 14 Correctness' = correct_tsignal14,
+    'Signal 15a Correctness' = correct_tsignal15a,
+    'Signal 15 Correctness' = correct_tsignal15) %>%
+  arrange(desc(Date)) %>%
+  na.omit() 
+
+write_csv(tech_correctness_signal_html,"tech_correctness_update.csv")
+
+tech_correctness_signal_html <- 
+  tech_correctness_signal_html %>%
+  head(5000)
+
+tech_correctness_signal_pdf <- 
+  tech_correctness_signal_html %>%
+  slice(which(Symbol == "AAPL")) 
+
+```
+
+```{r 401-5, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# ##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+# ##### [Individual stock outputs are suppressed, only `TSLA.US` related results are shown for illustration purposes. Refer to the *webapp* or the `html` version of the *e-Manual* for complete outputs. 个股输出数据及图表已隐藏，报告仅展示`特斯拉(TSLA.US)`的相关结果,完整图表可参阅*webapp* 或网页版*Global MAS 量化模型搭建说明*。]{style="color:red"} {-}
+
+# pdf output
+# Display TSLA Signal Results Tech Indicator output 
+kbl(head(tech_signal_pdf,10), booktabs = T, linesep = '', digits = 1,
+    caption = "Daily Trading Signals by Technical Indicators for AAPL.US",
+    format.args = list(big.mark = ",", scientific = FALSE)) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(1,4:18), bold = T) %>%
+  kableExtra::footnote(general = "Output 4.1.a: Latest 10 rows of data are shown.")
+```
+
+```{r 401-6, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# ##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+# ##### [Individual stock outputs are suppressed, only `TSLA.US` related results are shown for illustration purposes. Refer to the *webapp* or the `html` version of the *e-Manual* for complete outputs. 个股输出数据及图表已隐藏，报告仅展示`特斯拉(TSLA.US)`的相关结果,完整图表可参阅*webapp* 或网页版*Global MAS 量化模型搭建说明*。]{style="color:red"} {-}
+
+# pdf output
+# Display AAPL Correctness Results Tech Indicator output 
+kbl(head(tech_correctness_signal_pdf,10), booktabs = T, linesep = '', 
+    digits = 1,
+    caption = "Daily Trading Signals 5-day Prediction Correctness by Technical Indicators for AAPL.US",
+    format.args = list(big.mark = ",", scientific = FALSE)) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(1,4:18), bold = T) %>%
+  kableExtra::footnote(general = "Output 4.1.b: Latest 10 rows of data are shown.")
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-7, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display Signal Results Tech Indicator output 
+DT::datatable(tech_signal_html, 
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Daily Trading Signals by the Technical Indicators'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, scrollX = TRUE, 
+              style = list(width = '100%')), extensions = 'Buttons') %>%
+  formatRound(columns = c('Adjusted'),
+              digits = 1)  
+```
+
+Output 4.1.a: Daily trading signals by the technical indicators, includes `tsignal1`, `tsignal2`, ..., and `tsignal20`.The latest 1-year worth of results data are sliced for illustration purpose.   
+
+图表4.1.a: **技术指标**的日交易信号，包括`tsignal1`, `tsignal2`,..., `tsignal20`。 
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-8, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display Correctness Results Tech Indicator output 
+DT::datatable(tech_correctness_signal_html, 
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Daily Trading Signals 5-day Prediction Correctness by the Technical Indicators'),
+              options = list(
+                pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+                searching = TRUE, 
+                scrollX = TRUE,
+                columnDefs = list(list(
+                  targets =
+                    c("Signal 1 Correctness","Signal 2 Correctness",
+                      "Signal 3 Correctness","Signal 4 Correctness",
+                      "Signal 5 Correctness","Signal 6 Correctness",
+                      "Signal 7 Correctness","Signal 8 Correctness",
+                      "Signal 10 Correctness","Signal 11 Correctness",
+                      "Signal 12 Correctness","Signal 13 Correctness",
+                      "Signal 14 Correctness","Signal 15a Correctness",
+                      "Signal 15 Correctness"),
+                  render = JS(
+                "function(data, type, row) {",
+                "  return data === true ? 'TRUE' : 'FALSE';",
+                "}"
+              )
+            )),
+            style = list(width = '100%')
+          ), 
+          extensions = 'Buttons'
+         ) %>%
+  formatRound(columns = c('Adjusted'),
+              digits = 1)  
+```
+
+Output 4.1.b: Prediction correctness of the daily trading signals for 5 trading-days by the technical indicators, includes `tsignal1`, `tsignal2`, ..., and `tsignal20`.The latest 1-year worth of results data are sliced for illustration purpose, and `na.omit()` has applied for the display results.   
+
+图表4.1.b: **技术指标**的日交易信号5交易日的正确性，包括`tsignal1`, `tsignal2`,..., `tsignal20`。 展示最新的10行数据。
+
+
+### 技术指标股价趋势预测准确率排名 Price Trend Prediction Accuracy and Rankings for Daily Trading Signals by the Technical Indicators
+
+```{r 401-9, message=FALSE, warning=FALSE, include=FALSE}
+# Calculate the accuracy for each signal (monthly) (Tidy Format)
+tech_indicator_accuracy <- 
+  mega7data_modified %>%
+  mutate(date = as.Date(date),  
+         year_month = format(date, "%Y-%m")) %>%
+  group_by(year_month) %>%
+  summarise(
+    accuracy_tsignal1 = sum(correct_tsignal1, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal1)),
+    accuracy_tsignal2 = sum(correct_tsignal2, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal2)),
+    accuracy_tsignal3 = sum(correct_tsignal3, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal3)),
+    accuracy_tsignal4 = sum(correct_tsignal4, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal4)),
+    accuracy_tsignal5 = sum(correct_tsignal5, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal5)),
+    accuracy_tsignal6 = sum(correct_tsignal6, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal6)),
+    accuracy_tsignal7 = sum(correct_tsignal7, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal7)),
+    accuracy_tsignal8 = sum(correct_tsignal8, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal8)),
+    accuracy_tsignal10 = sum(correct_tsignal10, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal10)),
+    accuracy_tsignal11 = sum(correct_tsignal11, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal11)),
+    accuracy_tsignal12 = sum(correct_tsignal12, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal12)),
+    accuracy_tsignal13 = sum(correct_tsignal13, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal13)),
+    accuracy_tsignal14 = sum(correct_tsignal14, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal14)),
+    accuracy_tsignal15a = sum(correct_tsignal15a, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal15a)),
+    accuracy_tsignal15 = sum(correct_tsignal15, 
+                                    na.rm = TRUE) / sum(!is.na(correct_tsignal15))) %>%
+  ungroup() %>%
+  select(year_month, accuracy_tsignal1, accuracy_tsignal2, accuracy_tsignal3,
+         accuracy_tsignal4, accuracy_tsignal5, accuracy_tsignal6, accuracy_tsignal7,
+         accuracy_tsignal8, accuracy_tsignal10, accuracy_tsignal11, accuracy_tsignal12,
+         accuracy_tsignal13, accuracy_tsignal14, accuracy_tsignal15a, accuracy_tsignal15) %>%
+  rename("Signal 1 Accuracy" = accuracy_tsignal1,
+         "Signal 2 Accuracy" = accuracy_tsignal2,
+         "Signal 3 Accuracy" = accuracy_tsignal3,
+         "Signal 4 Accuracy" = accuracy_tsignal4,
+         "Signal 5 Accuracy" = accuracy_tsignal5,
+         "Signal 6 Accuracy" = accuracy_tsignal6,
+         "Signal 7 Accuracy" = accuracy_tsignal7,
+         "Signal 8 Accuracy" = accuracy_tsignal8,
+         "Signal 10 Accuracy" = accuracy_tsignal10,
+         "Signal 11 Accuracy" = accuracy_tsignal11,
+         "Signal 12 Accuracy" = accuracy_tsignal12,
+         "Signal 13 Accuracy" = accuracy_tsignal13,
+         "Signal 14 Accuracy" = accuracy_tsignal14,
+         "Signal 15a Accuracy" = accuracy_tsignal15a,
+         "Signal 15 Accuracy" = accuracy_tsignal15) %>%
+  arrange(desc(year_month))
+
+# Column rename
+tech_indicator_accuracy <-
+  tech_indicator_accuracy %>%
+  rename("Year-month" = year_month)
+```
+
+```{r 401-10, message=FALSE, warning=FALSE, include=FALSE}
+# Calculate the accuracy for each signal (monthly) (Transform Format)
+# Transform Columns and Rows
+tech_indicator_accuracy_transform <- 
+  tech_indicator_accuracy %>%
+  pivot_longer(
+    cols = -"Year-month",  
+    names_to = "signal_name",
+    values_to = "accuracy"
+  )
+
+tech_indicator_accuracy_transform <- 
+  tech_indicator_accuracy_transform %>%
+  pivot_wider(
+    names_from = "Year-month",  
+    values_from = accuracy,  
+    id_cols = signal_name     
+  )
+
+# Create a temp df for accuracy for further model procedures
+temp_accuracy_df <- tech_indicator_accuracy_transform
+```
+
+```{r 401-11, message=FALSE, warning=FALSE, include=FALSE}
+# The Accuracy for each signal (monthly) (Transform Format)
+tech_indicator_accuracy_transform <- 
+  tech_indicator_accuracy_transform %>%
+  mutate(signal_name = gsub(" Accuracy", "", signal_name), 
+         type = "Accuracy")
+
+tech_indicator_accuracy_transform <- 
+  tech_indicator_accuracy_transform %>% 
+  select(signal_name, type, everything()) %>%
+  rename("Signal Name" = "signal_name",
+         "Type" = "type")
+
+# The Accuracy ONLY each signal (monthly) (Transform Format)
+# tech_indicator_accuracy_transform
+```
+
+```{r 401-12, message=FALSE, warning=FALSE, include=FALSE}
+# Calculate the by-month ranking for each signal 
+
+# Function to calculate and insert rank columns, treating NAs uniformly
+insert_rank_columns <- function(df) {
+  # Identify columns that match the year-month pattern
+  year_month_cols <- names(df)[grepl("^\\d{4}-\\d{2}$", names(df))]
+  
+  # Calculate ranks for each "year-month" column and create a new "year-month Rank" column
+  new_rank_col_names <- vector("list", length(year_month_cols))
+  for (i in seq_along(year_month_cols)) {
+    col <- year_month_cols[i]
+    rank_col_name <- paste0(col, " Rank")
+    
+    # Only add "Rank" columns if not already exist to avoid duplication
+    if(!(rank_col_name %in% names(df))) {
+      df[[rank_col_name]] <- rank(-df[[col]], ties.method = "min", na.last = TRUE)
+    }
+    
+    # Track the new rank column names
+    new_rank_col_names[[i]] <- rank_col_name
+  }
+  
+  # Define the new order starting with 'signal_name'
+  new_col_order <- c("signal_name")
+  
+  # Append the order of columns for each month: "year-month Rank", "year-month"
+  for (col in year_month_cols) {
+    rank_col_name <- paste0(col, " Rank")
+    new_col_order <- c(new_col_order, rank_col_name, col)
+  }
+
+  # Ensure the new column order only includes existing columns in the dataframe
+  new_col_order <- new_col_order[new_col_order %in% names(df)]
+  
+  # Reorder df according to the new_col_order
+  df <- df[new_col_order]
+  
+  return(df)
+}
+
+# Apply the updated function to your dataframe
+tech_rank_accuracy_transform <- 
+  insert_rank_columns(temp_accuracy_df)
+```
+
+```{r 401-13, message=FALSE, warning=FALSE, include=FALSE}
+# Modify Accuracy and Rank (transformed format)
+
+# Rename signal_name values to remove " Accuracy"
+tech_rank_accuracy_transform$signal_name <- 
+  sub(" Accuracy", "", tech_rank_accuracy_transform$signal_name)
+
+# Rename month columns to include "Accuracy", Accuracy columns (not ending with "Rank")
+accuracy_cols <- 
+  names(tech_rank_accuracy_transform)[!grepl(" Rank$",
+                                             names(tech_rank_accuracy_transform))] 
+                                                      
+accuracy_cols <- setdiff(accuracy_cols, "signal_name")
+
+new_col_names <- sapply(names(tech_rank_accuracy_transform), function(col_name) {
+  if(col_name %in% accuracy_cols && !grepl("Accuracy$", col_name)) {
+    paste(col_name, "Accuracy", sep = " ")
+  } else {
+    col_name
+  }
+})
+
+# Update column names 
+names(tech_rank_accuracy_transform) <- new_col_names
+
+duplicates <- names(tech_rank_accuracy_transform)[duplicated(names(tech_rank_accuracy_transform))]
+
+# Create a temp df for rank+acc for further model procedures
+temp_acc_rank_df <- tech_rank_accuracy_transform 
+```
+
+```{r 401-14, message=FALSE, warning=FALSE, include=FALSE}
+# Monthly Accuracy and Rank (transformed format)
+tech_rank_accuracy_transform <- tech_rank_accuracy_transform %>%
+  rename(`Signal Name` = signal_name)
+
+# The Rank & Accuracy each signal (monthly) (Transform Format)
+tech_rank_accuracy_transform
+
+tech_rank_only_transform <- tech_rank_accuracy_transform %>%
+  select(`Signal Name`, ends_with("Rank"))
+
+# The Rank ONLY each signal (monthly) (Transform Format)
+tech_rank_only_transform
+```
+
+```{r 401-15, message=FALSE, warning=FALSE, include=FALSE}
+# Monthly Accuracy and Ranking (Tidy format)
+# Transform back to desired layout
+
+tech_rank_accuracy <- 
+  tech_rank_accuracy_transform %>%
+  pivot_longer(-`Signal Name`, names_to = "month_and_type", values_to = "value") %>%
+  separate(month_and_type, into = c("month", "type"), 
+           sep = " ", extra = "merge", fill = "right") %>%
+  mutate(type = ifelse(is.na(type) | type == "", "Accuracy", type)) %>%
+  pivot_wider(names_from = `Signal Name`, values_from = value, names_sep = " ", 
+              values_fn = list(value = ~first(.))) 
+
+tech_rank_accuracy <-
+  tech_rank_accuracy %>%
+  rename("Year-month" = month,
+         "Type" = type)
+
+# The Rank & Accuracy each signal (monthly) (Tidy Format)
+#tech_rank_accuracy
+```
+
+
+```{r 401-16, include=FALSE}
+tech_accuracy_output <- 
+  tech_rank_accuracy %>%
+  slice(which(Type == "Accuracy")) %>%
+  select(-Type)
+
+tech_rank_output <- 
+  tech_rank_accuracy %>%
+  slice(which(Type == "Rank")) %>%
+  select(-Type)
+
+write_csv(tech_accuracy_output, "tech_accuracy_update.csv")
+write_csv(tech_rank_output, "tech_rank_update.csv")
+```
+
+```{r 401-17, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# ##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+# pdf output
+# Monthly Accuracy Tech Indicators
+
+tech_accuracy_pdf <- 
+  tech_rank_accuracy %>%
+  slice(which(Type == "Accuracy")) 
+
+
+kbl(head(tech_accuracy_pdf,10), booktabs = T, linesep = '', 
+    digits = 3,
+    caption = "Monthly Price Prediction Accuracy of Daily Trading Signals by the Technical Indicators",
+    format.args = list(big.mark = ",", scientific = FALSE)) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(1, 3:10), bold = T) %>% # SHOW 8 SIGNALS, MODIFY
+  kableExtra::footnote(
+    general = "Output 4.1.c: Price prediction accuracy results for the latest 10 month are shown.", 
+    symbol = "Only results for the first 8 signals are shown due to pdf width restriction.")
+```
+
+```{r 401-18, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# ##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+# pdf output
+# Monthly Ranking+Accuracy Tech Indicators
+
+tech_rank_pdf <- 
+  tech_rank_accuracy %>%
+  slice(which(Type == "Rank")) 
+
+
+kbl(head(tech_rank_pdf,10), booktabs = T, linesep = '', 
+    digits = 0,
+    caption = "Monthly Price Prediction Rankings for Daily Trading Signals by the Technical Indicators",
+    format.args = list(big.mark = ",", scientific = FALSE)) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(1, 3:8), bold = T) %>% # SHOW 8 SIGNALS, MODIFY
+  kableExtra::footnote(
+    general = "Output 4.1.d: Price prediction signal rankings results for the latest 10 month are shown.", 
+    symbol = "Only results for the first 8 signals are shown due to pdf width restriction.")
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Sort tool is available next to the variable names.点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-19, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Monthly Accuracy Tech Indicators
+tech_accuracy_html <- 
+  tech_rank_accuracy %>%
+  slice(which(Type == "Accuracy")) %>%
+  mutate(across(3:ncol(.), ~ifelse(is.na(.), NaN, .))) %>%
+  select(-Type)
+
+# Display Tech Signal Prediction Accuracy 
+DT::datatable(tech_accuracy_html, 
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Monthly Price Prediction Accuracy of Daily Trading Signals by the Technical Indicators'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, scrollX = TRUE, 
+              style = list(width = '100%')), extensions = 'Buttons') %>%
+   formatRound(columns = c(2:16), digits = 3) 
+```
+
+Output 4.1.c: Price prediction accuracy results of the daily trading signals by the technical indicators, includes all trading signals.
+
+图表4.1.c: 
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Sort tool is available next to the variable names.点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-20, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Monthly Ranking+Accuracy Tech Indicators
+tech_rank_html <- 
+  tech_rank_accuracy %>%
+  slice(which(Type == "Rank")) %>%
+  select(-Type)
+
+# Display Tech Signal Monthly Rankings
+
+datatable(tech_rank_html, 
+          caption = tags$caption(style = 'caption-side: top; text-align: center; color: black; font-size: 200%;',
+                                 'Monthly Price Prediction Rankings for Daily Trading Signals by the Technical Indicators'),
+          options = list(
+            pageLength = 10, 
+            lengthMenu = c(5, 10, 15, 20),
+            searching = TRUE, 
+            scrollX = TRUE,
+            style = list(width = '100%')), 
+          extensions = 'Buttons') %>%
+   formatStyle(
+    columns = 2:ncol(tech_rank_html),  # Applies the styling from the second to the last column
+    backgroundColor = styleInterval(10, c('orange', 'transparent'))
+  )
+
+```
+
+Output 4.1.d: Price prediction signal rankings results of the daily trading signals by the technical indicators, includes all trading signals.
+
+图表4.1.d: 
+
+
+
+### 有效技术指标（动态跟新） Dynamic: Effective Technical Indicators 
+
+`In Progress`
+
+#### 有效日交易信号技术指标 (非日内交易) Selecting Effective Daily Trading Signalsby the Technical Indicators for non-intraday Rebalancing
+
+```{r 401-21, message=FALSE, warning=FALSE, include=FALSE}
+# Add Significant columns for each Rank column
+rank_cols <- grep("Rank", names(temp_acc_rank_df), value = TRUE)
+
+for(col_name in rank_cols) {
+  month_year <- gsub(" Rank", "", col_name)
+  significant_col_name <- paste(month_year, "Significant", sep = " ")
+  
+  # Create the Significant column based on the monthly rank being <= 10
+  temp_acc_rank_df[[significant_col_name]] <-
+    temp_acc_rank_df[[col_name]] <= 10
+}
+
+# Correct order of columns
+new_col_order <- c("signal_name") 
+
+for(col_name in rank_cols) {
+  month_year <- gsub(" Rank", "", col_name)
+  
+  significant_col_name <- paste(month_year, "Significant", sep = " ")
+  accuracy_col_name <- paste(month_year, "Accuracy", sep = " ") 
+  
+  if(accuracy_col_name %in% names(temp_acc_rank_df)) {
+    new_col_order <- c(new_col_order, significant_col_name, col_name, accuracy_col_name)
+  } else {
+    new_col_order <- c(new_col_order, significant_col_name, col_name)
+  }
+}
+
+tech_sig_rankacc_transform <- temp_acc_rank_df[, new_col_order]
+
+# The Significant & Rank & Accuracy each signal (monthly) (Transform Format)
+tech_sig_rankacc_transform
+
+tech_sig_only_transform <- tech_sig_rankacc_transform %>%
+  select(`signal_name`, ends_with("Significant"))
+
+tech_sig_only_transform <-
+  tech_sig_only_transform %>%
+  rename(`Signal Name` = signal_name)
+
+# The Significant ONLY each signal (monthly) (Transform Format)
+# tech_sig_only_transform
+```
+
+```{r 401-22, message=FALSE, warning=FALSE, include=FALSE}
+# Add LastRank columns for each Rank column
+
+# Initialize an empty list to store the new column names
+new_col_order <- c("signal_name")
+rank_cols <- sort(rank_cols, decreasing = TRUE)
+
+# Iterate over the rank columns to add "LastRank" columns
+for (i in seq_along(rank_cols)) {
+  col_name <- rank_cols[i]
+  month_year <- gsub(" Rank", "", col_name)
+  last_rank_col_name <- paste(month_year, "LastRank", sep = " ")
+  
+  if (i < length(rank_cols)) {
+    # Use the rank from the next month in the list as "LastRank"
+    next_month_col_name <- rank_cols[i + 1]
+    tech_sig_rankacc_transform [[last_rank_col_name]] <-
+      tech_sig_rankacc_transform [[next_month_col_name]]
+  } else {
+    # For the first month in the sequence 
+    tech_sig_rankacc_transform [[last_rank_col_name]] <- NA
+  }
+
+  significant_col_name <- paste(month_year, "Significant", sep = " ")
+  accuracy_col_name <- paste(month_year, "Accuracy", sep = " ")
+  
+  # Insert the LastRank column into the correct position
+  new_col_order <- c(new_col_order, last_rank_col_name, 
+                     significant_col_name, col_name)
+  
+  if(accuracy_col_name %in% names(tech_sig_rankacc_transform)) {
+    new_col_order <- c(new_col_order, accuracy_col_name)
+  }
+}
+
+new_col_order <- unique(new_col_order)
+
+tech_last_sigrankacc_transform <- 
+  tech_sig_rankacc_transform[, new_col_order]
+
+# The LastRank & Significant & Rank & Accuracy each signal (monthly) (Transform Format)
+# tech_last_sigrankacc_transform
+
+tech_last_only_transform <- tech_last_sigrankacc_transform %>%
+  select(`signal_name`, ends_with("LastRank"))
+
+tech_last_only_transform <-
+  tech_last_only_transform %>%
+  rename(`Signal Name` = signal_name)
+
+# The LastRank ONLY each signal (monthly) (Transform Format)
+# tech_last_only_transform
+```
+
+```{r 401-23, message=FALSE, warning=FALSE, include=FALSE}
+# Reinitialize new_col_order to include "Signal Name" at the beginning
+new_col_order <- c("signal_name")
+
+# Iterate through the sorted list of rank columns to calculate "Change"
+for (i in seq_along(rank_cols)) {
+  col_name <- rank_cols[i]
+  month_year <- gsub(" Rank", "", col_name)
+
+  # Define column names for "LastRank", "Significant", and "Change"
+  last_rank_col_name <- paste(month_year, "LastRank", sep = " ")
+  change_col_name <- paste(month_year, "Change", sep = " ")
+  significant_col_name <- paste(month_year, "Significant", sep = " ")
+  accuracy_col_name <- paste(month_year, "Accuracy", sep = " ")
+
+  # Calculate "Change" as LastRank - Rank for the current month
+  if (last_rank_col_name %in% names(tech_last_sigrankacc_transform)) {
+    tech_last_sigrankacc_transform[[change_col_name]] <-
+      tech_last_sigrankacc_transform[[last_rank_col_name]] -
+      tech_last_sigrankacc_transform[[col_name]]
+  } else {
+    tech_last_sigrankacc_transform[[change_col_name]] <- NA
+  }
+  
+  # Update new_col_order to insert "Change" column correctly
+  new_col_order <- c(new_col_order, change_col_name, 
+                     last_rank_col_name, significant_col_name, col_name)
+  
+  if(accuracy_col_name %in% names(tech_last_sigrankacc_transform)) {
+    new_col_order <- c(new_col_order, accuracy_col_name)
+  }
+}
+
+# Ensure the column order list contains only unique entries 
+new_col_order <- unique(new_col_order)
+
+# Reorder the dataframe columns based on the new order
+tech_change_lastsigrankacc_transform <- 
+  tech_last_sigrankacc_transform[, new_col_order]
+
+tech_change_lastsigrankacc_transform <-
+  tech_change_lastsigrankacc_transform %>%
+  rename(`Signal Name` = signal_name)
+
+# The Change & LastRank & Significant & Rank & Accuracy each signal (monthly) (Transform Format)
+# tech_change_lastsigrankacc_transform 
+
+tech_change_only_transform <- tech_change_lastsigrankacc_transform %>%
+  select(`Signal Name`, ends_with("Change"))
+
+# The Change ONLY each signal (monthly) (Transform Format)
+# tech_change_only_transform
+```
+
+```{r 401-24, message=FALSE, warning=FALSE, include=FALSE}
+# Convert to tidy format for all tech signal data
+
+tech_change_lastsigrankacc_tidy <- 
+  tech_change_lastsigrankacc_transform %>%
+  pivot_longer(
+    -`Signal Name`, 
+    names_to = "month_and_type", 
+    values_to = "value"
+  ) %>%
+  separate(
+    month_and_type, 
+    into = c("month", "type"), 
+    sep = " ", 
+    extra = "merge", 
+    fill = "right"
+  ) %>%
+  mutate(
+    type = ifelse(is.na(type) | type == "", "Accuracy", type),
+    month = str_replace(month, " ", "-") 
+  ) %>%
+  pivot_wider(
+    names_from = `Signal Name`, 
+    values_from = value, 
+    names_sep = " ", 
+    values_fn = list(value = ~first(.))
+  )
+
+final_cols <- c("month", "type", 
+                setdiff(names(tech_change_lastsigrankacc_tidy), 
+                        c("month", "type")))
+tech_change_lastsigrankacc_tidy <- 
+  tech_change_lastsigrankacc_tidy[final_cols]
+
+tech_change_lastsigrankacc_tidy <- 
+  tech_change_lastsigrankacc_tidy %>%
+  rename("Type" = type,
+         "Month" = month)
+
+# The Change & LastRank & Significant & Rank & Accuracy each signal (monthly) (Tidy Format)
+tech_change_lastsigrankacc_tidy
+
+```
+
+```{r 401-25, message=FALSE, warning=FALSE, include=FALSE}
+# Sample Code to slice 'Last Rank' tidy format df
+tech_last_tidy <- 
+  tech_change_lastsigrankacc_tidy %>%
+  slice(which(Type == "LastRank")) 
+
+# Sample Code to slice 'Significant' tidy format df
+tech_sig_tidy <- 
+  tech_change_lastsigrankacc_tidy %>%
+  slice(which(Type == "Significant")) %>%
+  select(-Type)
+
+# Sample Code to slice 'Change' tidy format df
+tech_change_tidy <- 
+  tech_change_lastsigrankacc_tidy %>%
+  slice(which(Type == "Change")) %>%
+  select(-Type)
+
+write_csv(tech_sig_tidy, "tech_sig_update.csv")
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Sort tool is available next to the variable names.点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-26, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Monthly Significant Tech Indicators
+datatable(tech_sig_tidy, 
+          caption = tags$caption(style = 'caption-side: top; text-align: center; color: black; font-size: 200%;',
+                                 'Significance of Daily Trading Signals by the Technical Indicators'),
+          options = list(
+            pageLength = 10, 
+            lengthMenu = c(5, 10, 15, 20),
+            searching = TRUE, 
+            scrollX = TRUE,
+              columnDefs = list(
+              list(targets = 2:16, # Adjusting this index to match your columns
+                   render = JS(
+                     "function(data, type, row) {",
+                     "  return data == 1 ? 'In Model' : 'NOT in Model';",
+                     "}"
+                   ))
+            )
+          ), 
+          extensions = 'Buttons',
+          callback = JS(
+            "table.rows().every(function(){",
+            "  var row = this.node();",
+            "  $(row).children().each(function(index, td){",
+            "    if ($(td).text() === 'In Model') {",
+            "      $(td).css({'background-color': 'orange'});",
+            "    }",
+            "  });",
+            "});"
+          )
+        )
+```
+Output 4.1.e: `In Progress`
+
+图表4.1.e: `In Progress`
+
+
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Sort tool is available next to the variable names.点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-27, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display Signal Results Tech Indicator output 
+DT::datatable(tech_change_tidy, 
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Monthly Ranking Changes of Trading Signals by the Technical Indicators'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, scrollX = TRUE, 
+              style = list(width = '100%')), extensions = 'Buttons') 
+```
+
+
+Output 4.1.f: `In Progress`
+
+图表4.1.f: `In Progress`
+
+```{r 401-28, eval=FALSE, include=FALSE}
+# Show significant Monthly which is last month significant tech indicators
+# should based on 
+tech_change_lastsigrankacc_transform
+
+#latest
+latest_significant_tech <- 
+  tech_change_lastsigrankacc_transform %>%
+  select(1:6)
+
+
+
+# Summarized Significant Indicators for each month
+
+```
+
+```{r 401-29, message=FALSE, warning=FALSE, include=FALSE}
+# Adjusting the data frame to handle rank properly with unique labels
+ranked_signals_df <- tech_change_lastsigrankacc_transform %>%
+  pivot_longer(
+    cols = grep(" Rank", names(tech_change_lastsigrankacc_transform), value = TRUE),
+    names_to = c("month", ".value"),
+    names_pattern = "(.*) (.*)",
+    values_drop_na = TRUE
+  ) %>%
+  filter(`Rank` > 0) %>%  # Assuming you want to filter out non-ranked signals
+  mutate(Rank = as.numeric(Rank)) %>%
+  arrange(month, Rank)
+
+# Generate a unique row ID for each signal to ensure unique names during pivot
+ranked_signals_df <- ranked_signals_df %>%
+  group_by(month) %>%
+  mutate(rank_id = row_number()) %>%
+  ungroup()
+
+# Pivoting to wide format while ensuring unique column names
+wide_format <- ranked_signals_df %>%
+  pivot_wider(
+    id_cols = month,
+    names_from = rank_id,
+    values_from = `Signal Name`,
+    names_prefix = "Rank ",
+    names_sort = TRUE,
+    names_repair = "unique"
+  )
+
+
+tech_signal_rank_tidy <- 
+  wide_format %>%
+  arrange(desc(month)) %>%
+  rename("Year-month" = month)
+
+
+tech_sigonly_signal_rank_tidy <-
+  tech_signal_rank_tidy %>%
+  select(1:11)
+
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Sort tool is available next to the variable names.点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-30, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display Signal Monthly Rankings
+
+datatable(tech_signal_rank_tidy, 
+          caption = tags$caption(style = 'caption-side: top; text-align: center; color: black; font-size: 200%;',
+                                 'Monthly Ranking for Daily Trading Signals by Technical Indicators'),
+          options = list(
+            pageLength = 10, 
+            lengthMenu = c(5, 10, 15, 20),
+            searching = TRUE, 
+            scrollX = TRUE,
+            style = list(width = '100%')), 
+          extensions = 'Buttons') 
+
+```
+
+Output 4.1.g: `In Progress`
+
+图表4.1.g: `In Progress`
+
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Sort tool is available next to the variable names.点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+```{r 401-31, echo=FALSE, message=FALSE, warning=FALSE}
+# html output
+# Display Signal Monthly Rankings
+
+datatable(tech_sigonly_signal_rank_tidy, 
+          caption = tags$caption(style = 'caption-side: top; text-align: center; color: black; font-size: 200%;',
+                                 'Monthly Significant/In-model Daily Trading Signals by Technical Indicators'),
+          options = list(
+            pageLength = 10, 
+            lengthMenu = c(5, 10, 15, 20),
+            searching = TRUE, 
+            scrollX = TRUE,
+            style = list(width = '100%')), 
+          extensions = 'Buttons') 
+
+```
+
+Output 4.1.h: `In Progress`
+
+图表4.1.h: `In Progress`
+
+```{r 401-32, include=FALSE}
+
+# Assuming df is your original data frame
+
+# Step 1: Identify the 'Significant' columns and the corresponding months
+significant_cols <- 
+  grep("Significant", names(tech_change_lastsigrankacc_transform), value = TRUE)
+
+# Step 2: Transform the data to a long format for easier manipulation
+long_df <- 
+  tech_change_lastsigrankacc_transform %>%
+  pivot_longer(cols = -`Signal Name`, 
+               names_to = "month_and_type", 
+               values_to = "value") %>%
+  separate(month_and_type, 
+           into = c("month", "type"),
+           sep = " ", extra = "merge") %>%
+  filter(type == "Significant" & value == TRUE) %>%
+  select(-type, -value)
+
+# Step 3: For each month, concatenate the Signal Names where 'Significant' is TRUE
+significant_tech_indicators <- 
+  long_df %>%
+  group_by(month) %>%
+  summarise(`significant tech indicators` = toString(`Signal Name`)) %>%
+  arrange(desc(month))
+```
+
+#### 日内交易有效技术指标 Effective Technical Indicators for Intra-day Trading 
+
+`TBD`
+
+```{r eval=FALSE, include=FALSE}
+#test working or not code
+newtest<-
+mega7data_modified %>%
+  group_by(symbol) %>%
+  slice(which(symbol == "TSLA")) %>%
+  select(date,symbol,adjusted, price_up_5day, price_down_5day,tsignal1, tsignal2,tsignal3, correct_tsignal1,correct_tsignal2,correct_tsignal3)
+```
+
+
+```{r eval=FALSE, include=FALSE}
+#test working or not code
+tsignal2_test_effective <-
+  mega7data_modified %>%
+  group_by(symbol) %>%
+  mutate(max_price_next_5days = 
+           lead(rollapply(adjusted, width = 5, FUN = max, 
+                          align = "left", fill = NA)),
+         min_price_next_5days = 
+           lead(rollapply(adjusted, width = 5, FUN = min,
+                          align = "left", fill = NA))) %>%
+  mutate(price_up_5day = ifelse(adjusted < max_price_next_5days, 
+                                "YES", 'NO'),
+         price_down_5day = ifelse(adjusted > min_price_next_5days,
+                                  'YES','NO')) %>%
+  mutate(RESULT_SMA5 = 
+           case_when(tsignal2 == 'BUY' & 
+                       price_up_5day == 'YES' ~ 'CORRECT',
+                     tsignal2 == 'BUY' &
+                       price_up_5day == 'NO' ~ 'FALSE',
+                     tsignal2 == 'SELL' & 
+                       price_down_5day == 'YES' ~ 'CORRECT',
+                     tsignal2 == 'SELL' &
+                       price_down_5day == 'NO' ~ 'FALSE',
+                     TRUE ~ NA)) 
+```
+
+
+
+
+
+## 技术信号选股策略模型 Model Illustration: Stock Selection Using Technical Trade Signals  
+
+`In Progress`
+
+
+### Other Model Construction Steps 
+
+`In Progress`
+
+```{r 402-1, echo=FALSE, message=FALSE, warning=FALSE}
+result_df_copy <- mega7data_modified
+tech_sig_copy <- tech_sig_tidy
+
+result_df_copy <-
+  result_df_copy %>%
+  select(date, symbol, adjusted, close, high, low, open, volume, 
+         week, year, tsignal1, tsignal2, tsignal3, tsignal4, tsignal5,
+         tsignal6, tsignal7, tsignal8, tsignal10, tsignal11, tsignal12, 
+         tsignal13, tsignal14,tsignal15a, tsignal15)
+
+#write_csv(result_df_copy,"result_df.csv")
+#write_csv(tech_sig_copy,"tech_sig_df.csv")
+```
+
+```{r 402-2, message=FALSE, warning=FALSE, include=FALSE}
+# Assuming result_df_copy and tech_sig_copy are already loaded
+
+# Convert the 'date' column in result_df_copy to Date type if not already
+result_df_copy$date <- as.Date(result_df_copy$date)
+
+result_df_copy <- 
+  result_df_copy %>%
+  mutate(year_month = format(date, "%Y-%m"))
+```
+
+```{r 402-3, include=FALSE}
+# Shift the signal columns up by one row while keeping the 'Month' column unchanged
+tech_sig_result <- tech_sig_copy %>%
+  mutate(Month = as.Date(paste0(Month, "-01"))) %>%  # Ensure Month is Date type
+  arrange(desc(Month)) %>%  # Sort by Month in descending order
+  mutate(across(-Month, lead)) %>%  # Shift all columns except Month up by one row
+  mutate(Month = format(Month, "%Y-%m"))
+# Merge the dataframes
+merged_df <- 
+  left_join(result_df_copy, tech_sig_result, by = c("year_month" = "Month"))
+
+write_csv(merged_df, "techsig_intermed.csv")
+
+# this was put in python for process. 
+```
+
+```{r eval=FALSE, include=FALSE}
+ #NOT USING 
+# Define the score mapping
+signal_mapping <- c("BUY" = 1, "SELL" = -1, "HOLD" = 0)
+
+# Preparing the function to compute scores
+compute_scores <- function(data) {
+  scores <- numeric(nrow(data))
+  
+  for (i in 1:15) {
+    signal_col <- sprintf("Signal %d", i)
+    tsignal_col <- sprintf("tsignal%d", i)
+    
+    # Special case for Signal 15a
+    if (i == 15) {
+      signal_col_a <- "Signal 15a"
+      tsignal_col_a <- "tsignal15a"
+      if (signal_col_a %in% names(data)) {
+        scores <- scores + ifelse(data[[signal_col_a]] == 1, signal_mapping[data[[tsignal_col_a]]], 0)
+      }
+    }
+    
+    # General case
+    if (signal_col %in% names(data)) {
+      scores <- scores + ifelse(data[[signal_col]] == 1, signal_mapping[data[[tsignal_col]]], 0)
+    }
+  }
+  
+  return(scores)
+}
+
+# Apply the score computation function
+merged_df <- merged_df %>%
+  rowwise() %>%
+  mutate(score_day = compute_scores(cur_data()))
+
+# Checking results
+head(merged_df)
+
+
+```
+
+```{r 402-4, message=FALSE, warning=FALSE, include=FALSE}
+# this is imported from python 
+# with score and rolling score 
+
+tech_sig_scores_copy <- read.csv("tech_sig_result.csv")
+
+#tech_sig_scores <- 
+  #tech_sig_scores %>%
+  #slice(which(symbol == "UPS")) %>%
+  #arrange(date)
+```
+
+```{r 402-5, echo=FALSE, message=FALSE, warning=FALSE}
+tech_sig_scores <-
+  tech_sig_scores_copy %>%
+  select(date, symbol, adjusted, open, close, high, low, volume, 
+         year_month, score_day, rolling_score) %>%
+  arrange(date)
+
+
+tech_stock_results_daily <- 
+  tech_sig_scores %>%
+  group_by(symbol, year_month) %>%
+  mutate(last_score = last(rolling_score)) %>%
+  ungroup() 
+
+```
+
+```{r 402-6, echo=FALSE, message=FALSE, warning=FALSE}
+# Calculate the unique rank for each symbol within each month
+# Rank each symbol within each month based on the last rolling score
+tech_stock_results_daily <- 
+  tech_stock_results_daily %>%
+  group_by(year_month) %>%
+  arrange(desc(last_score), symbol, .by_group = TRUE) %>%  # Using symbol to break ties consistently
+  mutate(rank_month = dense_rank(desc(last_score))) %>%
+  ungroup() 
+
+# Apply the computed rank uniformly across all days for each stock within each month
+# Ensure that the rank_month is uniformly applied to all days for each stock within each month
+tech_stock_results_daily <- 
+  tech_stock_results_daily %>%
+  group_by(symbol, year_month) %>%
+  mutate(rank_month = first(rank_month)) %>%
+  ungroup()
+
+#tech_stock_results_daily %>%
+  #slice(which(symbol == "UPS"))
+
+
+
+```
+
+```{r include=FALSE}
+tech_stock_results_daily_result <-
+  tech_stock_results_daily %>%
+  select(symbol, date, adjusted, open, high, low, year_month, rank_month) %>%
+  filter(rank_month <= 30) %>%
+  rename(close = adjusted,
+         datetime = date) %>%
+  mutate(datetime = as.Date(datetime)) %>%
+  select(-rank_month)
+
+# export for backtest use
+write_csv(tech_stock_results_daily_result, "tech_final_result_daily.csv")
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+##### [Result Temporarily Hidden]{style="color:red"} {-}
+
+```{r 402-7, message=FALSE, warning=FALSE, include=FALSE}
+tech_stock_results_daily_html <-
+  tech_stock_results_daily %>%
+  arrange(desc(date)) %>%
+  select(date, symbol, adjusted, score_day, rolling_score, rank_month) %>%
+  head(5000) 
+
+
+# html output
+# Display Signal Results Tech Indicator output 
+DT::datatable(tech_stock_results_daily_html, 
+              colnames = c('Date' = 2, 'Symbol' = 3, 'Adjusted' = 4,
+                           'Score Today' = 5, 'Month Rolling Score' = 6,
+                           'Monthly Rank' = 7),
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Monthly Rankings for all stocks based on Scores \ by Significant Technical Indicator Daily Trading Signals'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, scrollX = TRUE, 
+              style = list(width = '100%')), extensions = 'Buttons') %>%
+  formatRound(columns = c('Adjusted'),
+              digits = 1)  
+```
+
+Output 4.2.a: `In Progress`
+
+图表4.2.a: `In Progress`
+
+
+```{r 402-8, echo=FALSE, message=FALSE, warning=FALSE}
+# Month summarized rankings (Tidy)
+
+tech_stock_results_month_tidy <- 
+  tech_stock_results_daily %>%
+  group_by(symbol, year_month) %>%
+  summarise(
+    score_month = first(last_score),  
+    rank_month = first(rank_month),
+    .groups = 'drop') %>%
+  ungroup()  # Remove the grouping
+
+
+# Calculate the highest rank used across all months
+max_rank <- max(tech_stock_results_month_tidy$rank_month)
+
+# Ensure each month has entries up to `max_rank`
+tech_stock_results_month_tidy <- 
+  tech_stock_results_month_tidy %>%
+  group_by(year_month) %>%
+  complete(rank_month = 1:max_rank, fill = list(symbol = "No Entry")) %>%
+  ungroup()
+
+# Adjust ranks to ensure no gaps and then re-assign ranks
+tech_stock_results_month_tidy <-
+  tech_stock_results_month_tidy %>%
+  group_by(year_month) %>%
+  arrange(rank_month) %>%
+  mutate(adjusted_rank = row_number()) %>%
+  arrange(desc(year_month)) %>%
+  ungroup()
+
+
+# Significant 
+tech_stock_results_month_sigonly_tidy <-
+  tech_stock_results_month_tidy %>%
+  filter(adjusted_rank %in% 1:30) 
+
+```
+
+
+
+### Dynamic: Stock Selection Results 
+
+`In Progress`
+
+
+```{r 402-9, echo=FALSE, message=FALSE, warning=FALSE}
+company_info = read.csv("sp500ohlc_long_clean_meta_2021.csv")
+
+company_info_unique <- 
+  company_info %>%
+  group_by(symbol) %>%
+  summarise(
+    company_name = first(company_name),
+    CUSIP = first(CUSIP),
+    industry = first(industry),
+    sector = first(sector)
+  )
+
+
+tech_stock_results_month_tidy <- 
+  tech_stock_results_month_tidy %>%
+  left_join(company_info_unique, by = c("symbol" = "symbol"))
+
+
+tech_stock_results_month_tidy <-
+  tech_stock_results_month_tidy %>%
+  select(year_month, adjusted_rank, symbol,company_name, score_month, 
+          industry, sector, CUSIP)
+
+# export for streamlit use
+write_csv(tech_stock_results_month_tidy, "tech_final_result_monthly.csv")
+```
+
+##### [Result Temporarily Hidden]{style="color:red"} {-}
+
+```{r 402-10, message=FALSE, warning=FALSE, include=FALSE}
+# html table data prep include comp name and sector industry
+tech_stock_results_month_sigonly_tidy_html <-
+  tech_stock_results_month_sigonly_tidy %>%
+  select(year_month, symbol, score_month, adjusted_rank) 
+
+company_info_unique <- 
+  company_info %>%
+  group_by(symbol) %>%
+  summarise(
+    company_name = first(company_name),
+    CUSIP = first(CUSIP),
+    industry = first(industry),
+    sector = first(sector)
+  )
+
+tech_stock_results_month_sigonly_tidy_html <- 
+  tech_stock_results_month_sigonly_tidy_html %>%
+  left_join(company_info_unique, by = c("symbol" = "symbol"))
+
+tech_stock_results_month_sigonly_tidy_html <-
+  tech_stock_results_month_sigonly_tidy_html %>%
+  select(year_month, symbol, score_month, adjusted_rank, 
+         company_name, industry, sector, CUSIP)
+```
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+##### [Result Temporarily Hidden]{style="color:red"} {-}
+
+```{r 402-11, message=FALSE, warning=FALSE, include=FALSE}
+
+# html output
+# Display EMA values
+DT::datatable(tech_stock_results_month_sigonly_tidy_html, 
+              colnames = c('Year-month' = 2, 'Symbol' = 3, 'Score Month' = 4,
+                           'Monthly Rank' = 5, 'Company Name' = 6,
+                           'Industry' = 7, 'Sector' = 8),
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Stocks Selected in Model (Top 30) with Monthly Ranking and Scores'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, scrollX = TRUE, style = list(width = '100%')), extensions = 'Buttons')
+```
+
+Output 4.2.b: `In Progress`
+
+图表4.2.b: `In Progress`
+
+
+```{r 402-12, echo=FALSE, message=FALSE, warning=FALSE}
+# Transform version
+# Pivot the data to wide format using the adjusted ranks
+rank_table <- tech_stock_results_month_tidy %>%
+  select(year_month, symbol, adjusted_rank) %>%
+  pivot_wider(
+    names_from = year_month,
+    values_from = symbol,
+    id_cols = adjusted_rank
+  ) %>%
+  rename(`Rank Month` = adjusted_rank) %>%
+  arrange(`Rank Month`)
+
+# Sort columns to start with the most recent month right after 'Rank Month'
+latest_first <- rank_table %>%
+  select(`Rank Month`, sort(names(rank_table)[-1], decreasing = TRUE))
+```
+
+```{r 402-13, message=FALSE, warning=FALSE, include=FALSE}
+# export entire table with transform version list version for streamlit
+write_csv(latest_first, "tech_final_result_monthly_transform.csv")
+
+```
+
+
+```{r 402-14, echo=FALSE, message=FALSE, warning=FALSE}
+# prepare table html for latest month result 
+transform_list_monthly_stocks_html_latest <- 
+  latest_first %>%
+  select(`Rank Month`, `2024-03`)
+
+# Merge the ranking table with the company information
+transform_list_monthly_stocks_html_latest <- left_join(transform_list_monthly_stocks_html_latest, company_info_unique, by = c("2024-03" = "symbol"))
+
+# Rename the '2024-03' column to 'symbol' if needed for clarity after join
+transform_list_monthly_stocks_html_latest <-
+  transform_list_monthly_stocks_html_latest %>%
+  rename(symbol = `2024-03`) %>%
+  select(`Rank Month`, `symbol`, company_name, industry, sector, CUSIP)
+
+```
+
+
+##### [Code Hidden 代码已隐藏]{style="color:red"} {-}
+
+##### [Enter the ticker/symbol in the search box for stock-specific results. Sort tool is available next to the variable names. 搜索框中输入股票代码可以过滤展示个股相关结果。点击变量名旁的箭头可进行排序。]{style="color:purple"} {-}
+
+##### [Result Temporarily Hidden]{style="color:red"} {-}
+
+```{r 402-15, message=FALSE, warning=FALSE, include=FALSE}
+
+# html output
+# Display EMA values
+DT::datatable(transform_list_monthly_stocks_html_latest, 
+              colnames = c(' Monthly Ranking' = 2, 'Symbol' = 3, 
+                           'Company Name' = 4,
+                           'Industry' = 5, 'Sector' = 6),
+              caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                            text-align: center; color: black; 
+                                            font-size: 200%;',
+                                            'Latest Stock Scoring and Ranking Results'),
+              options = list(pageLength = 10, lengthMenu = c(5, 10, 15, 20),
+              searching = TRUE, scrollX = TRUE, style = list(width = '100%')), extensions = 'Buttons')
+```
+
+Output 4.2.c: `In Progress`
+
+图表4.2.c: `In Progress`
+
+
+
+## Portfolio Simulation - Back-test for Base Model Strategy 组合回测模拟
+
+`In Progress`
+
+Refer to *webapp* for now. 
+***MAS Webapp*** [*link*](https://webapp.multi-asset-strategy.cn)  
+
+## Model Drawbacks & Risks 模型缺陷和风险
+
+`In Progress`
+
+All the concepts explained here can be applied on any trading instrument (like stock, currency, options, indices or crypto).
+arrow believe the model has almost no use for other asset classes
+
+因为模型的因子过滤是人为主观设定的，且为固定不可变动的过滤条件，一些由于股价或交易量显著异动的股票可能因此被模型剔除，由此可能会产生错失良好投资机遇的机会成本。
+
+Machine Learning integration for prices prediction is possible however not reliable to depend trading decisions soley on price predictions.
+
+Fudamental  analysis is crucial it's theoretically possible that some/all technical or fundamental indicators fail under various market conditions.
+
+Stocks with unusual price and/or volume movements will be filtered out based on subjectively-set criteria, certain positive investment opportunities may be omitted (as the model filtered them out) due to the fixed filter rules.
+
+
+```{r eval=FALSE, include=FALSE}
+量价因子Price Volume Trend ($\text{PVT}$) 是一种技术分析(technical analysis)得出的指标，完全依据历史交易数据(solely based on historical trading price and volume)，其对未来的预测能力理论上是有限的，可以作为一种交易的/择时的信号判断方法，组合选股仍因依赖其他以基本面研究方式为基础的方法和模型 (macros, sector trends, factor models)。
+```
+
+
+
+```{r include=FALSE}
+# Export data
+write.csv(mega7data_modified,"mega7base.csv")
+```
+
+
+<div style="text-align: right;">
+**返回目录  **[快速索引 Quick Table of Contents] 
+</div>
+
+
+
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;"></div>
+
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+    内部资料，请勿外传! 
+
+    Internal documents, please do not disseminate! 
+
+    本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+    均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+    以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+    The web-based Quantitative Model e-Manual and web application are for information
+    purposes only. The information and opinion contained and expressed herein, shall not,
+    and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+    solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+    representation of any kind or form whatsoever to buy or sell any security, financial
+    instrument or any investment or other specific product.
+</div>
+
+
+
+
+
+
+

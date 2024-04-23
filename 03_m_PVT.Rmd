@@ -1,0 +1,9 @@
+## [技术指标13：成交量趋势 Technical Indicator 13: Price Volume Trend (PVT)]{style="color:blue"}
+
+
+`In Progress`
+
+
+One of the most common basic indicators traders examine is the trading volume.
+Trading volume is an indication for the ‘activeness’ of a financial instrument.
+Depending on the financial instruments, trading volume can be measured either using the number of stocks traded or number of contracts with changed ownerships.

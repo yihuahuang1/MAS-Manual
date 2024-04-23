@@ -1,0 +1,32 @@
+book_filename: "series"
+language:
+  ui:
+    chapter_name: "Chapter "
+rmd_files: [
+  "index.Rmd",
+  "00_Quick-Table-of-Contents.Rmd",
+  "00_pre_prehtml.Rmd",
+  "00_Multi-asset-Investment-Strategy.Rmd",
+  "01a_Base_Stock_Cover.Rmd",
+  "01_Investment-Strategy-Outlook.Rmd",
+  "02_Base-Model-Construction.Rmd",
+  "03_Technical-Indicators-Construction.Rmd",
+  "03_b_EMA.Rmd",  
+  "03_c_MACD.Rmd",
+  "03_d_RSI.Rmd",
+  "03_e_BB.Rmd",
+  "03_f_ROC.Rmd",
+  "04_Base-Model-Performance.Rmd",
+  "Full-Model-Construction.Rmd",
+  "Full-Model-Performance.Rmd",
+  "Stock-Selection-Strategy-Summary.Rmd",
+  "Asset-Allocation-Model.Rmd",
+  "Quant-Model-Other-Asset-Class.Rmd",
+  "Risk-Disclosure.Rmd",
+  "Appendix.Rmd"
+]
+delete_merged_file: true 
+output_dir: "docs"
+output:
+  bookdown::gitbook:
+    css: style.css

@@ -1,0 +1,234 @@
+---
+title: "Price Volume Strategy Codes"
+author: "Albert Huang"
+date: "2024-03-13"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# Investment Strategy Outlook 投资策略及模型规划
+
+## Research Objectives 研究目标
+
+## Considerations on Investment Strategy 投资策略的思考
+
+# Clean the environment
+rm(list = ls())
+
+### Load packages
+library(tsibble)
+library(lubridate)
+library(tidyverse)
+library(quantmod)
+library(rvest) 
+library(xts)
+library(TTR)
+library(blotter)
+library(rvest)
+library(quantstrat)
+library(zoo)
+library(knitr)
+library(kableExtra)
+library(readxl)
+# nasdaq api 44D9F6_XzqEy8xstEuxb
+
+allfactortable <- read_excel("factor_list.xlsx")
+
+# Display factors (both tech and fundamental) 
+kbl(allfactortable, booktabs = T, linesep = "", digits = 1, 
+    caption = "Common Indicators and Factors in Equity Research", 
+    format.args = list(big.mark = ",", scientific = FALSE),
+    col.names = c("Factor Type","Factor Categories","Sample List of Indicators")) %>%
+  kable_styling(latex_options = c("striped", "scale_down")) %>%
+  column_spec(c(1:2), bold = T) %>%
+  footnote(general = "List of common indicators and factors in Equity Research are shown above, not all factors above are used in this study.")
+
+
+# (Base) Model Construction 基础模型搭建
+
+## Intro on (Base) Model Design and Construction 模型设计搭建概要
+
+# Data Intake
+mega7data = read.csv("mega7tidy.csv")
+mega7mcap = read.csv("mega7marketcap.csv")
+
+# Full data part data intake for loop 
+
+# Data cleanup & add marketcap column to the main dataframe
+mega7data_modified <- 
+  mega7data %>%
+  inner_join(mega7mcap, join_by(symbol == Stock)) %>%
+  rename(market_cap = Marketcap) %>%
+  select(!X.x) %>% 
+  select(!X.y) 
+
+kbl(tail(mega7data_modified,10), booktabs = T, linesep = "", 
+    digits = 1, caption = "Cleaned Data Glance: NYSE and NASDAQ Stocks", 
+    format.args = list(big.mark = ",", scientific = FALSE)) %>%
+  kable_styling(latex_options = c("striped","scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(3,8,9,10), bold = T) %>%
+  footnote(general = "Output 2.1.a: Last 10 rows are shown.")
+
+
+## Portfolio-specific Subjective Indicators 其他组合相关过滤指标
+
+
+### \textcolor{blue}{Subjective indicator No.1: Market Cap > \$ 7 billion}   
+
+
+cap_remove_list_intermed <-
+  mega7data_modified %>%
+  filter(market_cap < 7e+9) 
+
+cap_remove_list <- 
+  pull(cap_remove_list_intermed, symbol)  %>%
+  unique()
+
+mega7data_modified <- 
+  mega7data_modified %>%
+  filter(!symbol %in% cap_remove_list)
+
+print(cap_remove_list)
+
+
+### \textcolor{blue}{Subjective indicator No.2: Average Weekly Volume > 1 million}        
+
+
+mega7data_modified <-
+  mega7data %>% 
+  mutate(week = strftime(date,format = "%V")) %>%
+  mutate(year  = year(ymd(date))) 
+
+weekavg_volume <-
+  mega7data_modified %>%
+  group_by(year,week,symbol) %>%
+  summarise(average.volume = mean(volume)) 
+
+kbl(tail(weekavg_volume,10), booktabs = T, linesep = "",
+    digits = 1, caption = "Average Weekly Trading Volume", 
+    format.args = list(scientific = FALSE), longtable = T,
+    col.names = c("Year","Week","Symbol","Average Volume")) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(4), bold = T) %>%
+  footnote(general = "Output 2.2.a: Last 10 rows are shown.")
+
+volume_remove_list_intermed <-
+  weekavg_volume %>%
+  filter(average.volume < 1e+6) 
+
+volume_remove_list <- 
+  pull(volume_remove_list_intermed, symbol)  %>%
+  unique()
+
+mega7data_modified <- 
+  mega7data_modified %>%
+  filter(!symbol %in% volume_remove_list)
+
+print(volume_remove_list)
+
+
+### \textcolor{blue}{Subjective indicator No.3: Daily Return $\nless -15\%$}  
+
+
+mega7data_modified <-
+  mega7data_modified %>% 
+  group_by(symbol) %>%
+  mutate(price_pctchange = (adjusted/lag(adjusted)-1)*100)
+
+pctchange_display <-
+  mega7data_modified %>% 
+  select(symbol,date,adjusted,price_pctchange) %>%
+  tail(10)
+
+
+
+kbl(pctchange_display, booktabs = T, linesep = "",
+    digits = 4, caption = "Price Percentage Change (1-day ROC)", 
+    format.args = list(big.mark = ",", scientific = FALSE),
+    col.names = c("Symbol","Date","Adj Close","Price Change %")) %>%
+  kable_styling(latex_options = c("striped", "scale_down", 
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(3,4), bold = T) %>%
+  footnote(general = "Output 2.2.b: Last 10 rows are shown.")
+
+prcpct_remove_list_intermed <-
+  mega7data_modified %>%
+  filter(price_pctchange < -15) 
+
+prcpct_remove_list <- 
+  pull(prcpct_remove_list_intermed, symbol)  %>%
+  unique()
+
+mega7data_modified <- 
+  mega7data_modified %>%
+  filter(!symbol %in% prcpct_remove_list)
+
+print(prcpct_remove_list)
+
+
+### \textcolor{blue}{Subjective indicator No.4: Annualized volatility $\ngtr 100\%$}  
+
+
+mega7data_modified <-
+  mega7data_modified %>%
+  mutate(annual_volatility = price_pctchange * sqrt(252)) 
+
+annual_volatility_display <-
+  mega7data_modified %>%
+  select(date, adjusted, symbol, annual_volatility) %>%
+  na.omit() %>%
+  tail(10)
+
+kbl(annual_volatility_display, booktabs = T, linesep = "",
+    digits = 4, caption = "Implied Annualized Volatility", 
+    format.args = list(big.mark = ",", scientific = FALSE),
+    col.names = c("Date","Adj Close","Symbol","Annual Volatility %")) %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center") %>%
+  column_spec(c(2,4), bold = T) %>%
+  footnote(general = "Output 2.2.c: Last 10 rows are shown.")
+
+volat_remove_list_intermed <-
+  mega7data_modified %>%
+  filter(abs(annual_volatility) > 200) # change to 100
+
+volat_remove_list <- 
+  pull(volat_remove_list_intermed, symbol)  %>%
+  unique()
+
+mega7data_modified <- 
+  mega7data_modified %>%
+  filter(!symbol %in% volat_remove_list)
+
+print(volat_remove_list)
+
+# ADD STOCK REMOVED COMP NAME FULL, GICS SECTOR 
+remove_stock_list <- 
+  t(rbind(cap_remove_list,volume_remove_list,prcpct_remove_list,volat_remove_list)) 
+
+colnames(remove_stock_list) <- "remove_stock_list"
+
+kbl(tail(remove_stock_list,10), booktabs = T, linesep = "", 
+    col.names = "Symbol" , 
+    caption = "Stocks Removed by the Subjective Indicators") %>%
+  kable_styling(latex_options = c("striped", "scale_down",
+                                  "HOLD_position"), 
+                position = "center", full_width = T) %>%
+  column_spec(c(2), bold = T) %>%
+  footnote(general = "Output 2.2.c: Last 10 rows are shown.",
+           symbol = "In no means these removed stocks will bring negative investment returns, some of them may bring substantial (positive) future returns.")
+```
+
+## Technical Indicators Construction 技术指标搭建
+
+
+**END HERE*
+
+
+

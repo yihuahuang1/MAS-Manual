@@ -1,0 +1,220 @@
+# Presentation: MAS Strategy - Stock Selection Model {-}
+
+## Presentation part A {-}
+
+**Date: 2024-04-19**
+
+
+## $\diamondsuit$ 选股模型 Stock Selection Model {-} 
+
+
+```{r prea-1, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::include_graphics("stock_model_flow.png")
+```
+
+[选股基础模型：技术指标选股工具 The Base Model: a Technical Signaling Tool for Stock Selection ]{style="color:blue"}
+
+* [基础模型搭建 (Base) Model Construction]  [`MAS Stock Selection`]  
+
+* [技术指标搭建 Technical Indicators Construction Presentation]  [`MAS Stock Selection`]   
+
+
+[完整模型：基于量化指标的全面选股工具 The Complete Model: a Comprehensive Stock Selection Model: Using Quantitative Indicators]{style="color:blue"} 
+
+* **传统多因子模型 选股+预测**
+
+*IC* *IR*  
+
+传统多因子模型使用的缺陷 (e.g. Barra)
+
+- 数据: timeline match, 频率不对齐(Q,M)
+(match动作 $\epsilon$)
+
+- 缺失高频数据
+
+
+* **基本面因子 (or non-technical)**
+
+基本面 经营效率  盈利能力 红利因子 
+
+估值因子 成长因子 规模因子 
+
+质量因子 现金流流动性 
+
+**情绪因子**  
+估值 成长 收益预期 流动性 敏感性(油 天然气 原材料商品等)
+
+
+* **动态过滤月度 因子/指标** 
+
+instead of 因子库or评分  
+
+全面性测试 (population vs. sample) 
+
+筛选因子后$\rightarrow$ `Complete` Quant Stock Selection Model 
+
+多维度: weight + backtest
+
+
+* **定性+定量**
+
+- share buyback 
+
+- company-specific research (fundamental)
+
+- ER analyst ratings + market consensus 
+
+
+
+
+[其他权益相关模型]{style="color:blue"} 
+
+* **股价预测 *GARCH* *ARIMA* *ML* *DL*  **
+
+* **风格+行业轮动模型**
+
+* **风险控制 combine with **MAS** **
+
+
+[选股模型Prospect]{style="color:blue"} 
+
+* **模型建立方式**  
+
+开发 $\Rightarrow$ 可变性(adaptive) 
+
+no pre-designed frameworks 
+
+框架 $\Rightarrow$ “无极调节” 
+
+保留加入ML&DL 的可行性
+
+e.g: 个股回测
+
+
+* **模型优化（回测+指标因子再优化[回测拆解]）**
+
+* **基础量化轮动模型框架开发** 
+
+获取高频maco trend的工具(within and across asset classes)
+
+* **股票看板(stock dashboard)  + 信息汇总**
+
+Stock pool, portfolio holdings, multi-variate info with live-update from quant strategy (dynamically update); monitor, gather info, alerts 
+
+Quant stock model $\Rightarrow$ 综合评分系统 stock ppol
+
+- 结合个股基本面 (研究员评级+ market consensus)
+- 结合市场宏观基本面
+
+
+* **时间维度**  
+
+Ultra-short term: Intra-day signals  
+
+Short-to-medium term: heavily depend on technical-indicator model 
+
+Medium-to-long term: comprehensive scoring system *with dynamic update* [quant selection from *tech*+*fundamental* + macro + market consensus]
+
+
+
+
+
+`Hidden`
+
+## $\diamondsuit$ Prospect: 多资产Quant框架 MAS Framework{-} 
+
+* **其他资产类别** 
+
+-FI products (Govt. Bonds + Credits)
+Yield Prediction
+
+-Equities, 
+
+-ETFs 
+Rotation
+
+-FXs 
+ARIMA+GARCH
+
+
+e.g. **GTAA**
+
+以新兴市场和科技股作为主要风险资产，通过美国10年期政府债券、黄金期货和现金/定期存款进行对冲。 
+
+资产配置和择时（TAA）：配置比例依赖于全球宏观经济、基本面和资产配置及投资组合优化的多策略量化模型。  
+
+投资时机：何时进入或退出头寸。  
+
+投资类别选择：股票与固定收益产品、小盘股与大盘股、价值股与成长股。  
+
+全球范围和时机（G）：在资产类别内选择地区、国家和行业：发达市场与新兴市场（固定收益产品、股票、ETF、外汇波动）及具体的国家/地区。
+
+
+* **组合Allocation Model** 
+
+* 相关性 correlation和有效前沿(EF)   
+
+常通过Max (weighted) Sharpe ratio + Min 
+
+预期收益估算 +  
+
+资产风险, 标准差 Volatility +  
+
+资产或者资产或者标的之间相关系数 Covariance 协方差  
+
+
+**不仅可以优化 多种资产 也可以优化一类资产多个标的组合的配比** 
+
+
+**Allocation model** 框架建设
+
+实现方式： Mean variance model and/or Black-litterman Model
+
+形成   
+
+(1) max Sharpe 组合
+
+(2) Max utility 组合
+
+(3) Max return组合 
+
+(4) Min risk 组合
+
+$^*$ Blacklitterman模型 其中包括 一定模拟 运用了贝叶斯方法 但是是一个反向验证 大类组合的配置比例 主观观点的一个方式
+
+分别回测+结合macro 综合优势 可以相互对比和补充  $\Rightarrow$ allocation weights for **optimal portfolio** 
+
+
+**Rotation 轮动模型** 框架建设  
+
+* ETF 轮动  (短期长期)
+Region $\times$ asset class 
+
+高频数据  
+
+* Macro model (中长期)  
+
+跟踪或预测 *via*领先指标等 
+
+中低频数据  
+
+e.g CPI 拆解
+
+
+**组合优化+风险控制**
+
+
+Portfolio Performance Optimization tools
+
+Risk Management 
+
+
+##### **MAS投资研究闭环**{-}
+
+
+
+
+
+
+
+

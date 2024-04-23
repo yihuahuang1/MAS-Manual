@@ -1,0 +1,344 @@
+---
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# Load necessary libraries
+library(shiny)
+library(plotly)
+library(DT)
+library(dplyr)
+library(ggplot2)
+library(shinydashboard)
+```
+
+```{r include=FALSE}
+# Data Intake
+
+mega7subjyurl <- url("https://gitee.com/yihuahuang1/stockdata/raw/master/mega7subj.csv")
+mega7capurl <- url("https://gitee.com/yihuahuang1/stockdata/raw/master/mega7marketcap.csv")
+#mega7data = read.csv(mega7subjyurl)
+#mega7mcap = read.csv(mega7capurl)
+mega7data <- read.csv("mega7subj.csv")
+mega7mcap = read.csv("mega7marketcap.csv")
+
+mega7data_modified <- 
+  mega7data %>%
+  inner_join(mega7mcap, join_by(symbol == Stock)) %>%
+  rename(marketcap = Marketcap) %>%
+  select(!X.x) %>% 
+  select(!X.y) 
+mega7data_modified$marketcap <- round(mega7data_modified$marketcap, 0)
+```
+
+
+```{r include=FALSE}
+# Define UI
+ui22 <- fluidPage(
+  tags$head(
+    tags$meta(name = "viewport", content = "width=device-width, initial-scale=1")
+  ),           
+  
+  titlePanel("DEMO: Stock Selection - Interactive Output Page 1 动态交互结果展示(第1部分)",
+             windowTitle = "Interactive Output-Stock 1"),
+  
+  div(
+    style = "display: flex; flex-direction: column; height: 200vh;",
+    sidebarLayout(
+      sidebarPanel(
+        selectInput("symbol", "Ticker 代码 DEMO", 
+                    choices = unique(mega7data_modified$symbol)),
+        
+        dateRangeInput("dateRange", "Date Range 时间范围", 
+                       start = min(mega7data_modified$date), 
+                       end = max(mega7data_modified$date)),
+        
+        checkboxGroupInput("variables", "Variables 量价数据 (可多选)", 
+                           choices = c("Adjusted close" = "adjusted", "High" = "high", 
+                                       "Low" = "low","Open" = "open", "Close" = "close",
+                                       "Trading volume" = "volume",
+                                       "Market cap (USD)"="marketcap"),
+                           selected = c("adjusted","volume")),
+        
+        checkboxGroupInput("multiChoiceVars", "Subjective Filters 过滤指标 (可多选)", 
+                           choices = c("Percent Change or ROC" = "price_pctchange",
+                                   "Average Weekly Volume" = "average.volume",
+                                   "Implied Volatility" = "annual_volatility"))
+      ),
+      mainPanel(
+        tabsetPanel(
+          tabPanel("Data Table 数据", DTOutput("table")),
+          tabPanel("Price Chart 股价", plotlyOutput("candleChart")),
+          tabPanel("Volume Chart 交易量", plotlyOutput("volumePlot")),
+          tabPanel("Subjective Filters 过滤指标", DTOutput("subjectiveTable"), uiOutput("dynamicGraphs"))
+
+  ),
+        style = "flex-grow: 1;", # This allows the main content to expand and fill available space
+       uiOutput("instructions")
+      )
+    )
+  )
+)
+
+```
+
+
+
+```{r include=FALSE}
+
+# Define server logic
+server22 <- function(input, output) {
+  # Reactive expression for filtered data for the table
+  filteredData <- reactive({
+    req(input$symbol, input$dateRange)
+    mega7data_modified %>%
+      filter(symbol == input$symbol, 
+             date >= input$dateRange[1], 
+             date <= input$dateRange[2]) %>%
+      select(date, symbol, all_of(input$variables)) %>%
+      arrange(desc(date))
+  })
+ 
+  # Reactive expression for filtered data for the graphs
+  filteredGraphData <- reactive({
+    req(input$symbol, input$dateRange)
+    data <- mega7data_modified %>%
+      filter(symbol == input$symbol, 
+             date >= input$dateRange[1], 
+             date <= input$dateRange[2]) %>%
+      select(date, adjusted, volume, high, low, open) %>%
+      mutate(date = as.Date(date),
+             hover_text = paste("Date:", format(date, "%Y-%m-%d"), 
+                                "<br>Open:", sprintf("%.2f", open), 
+                                "<br>Close:", sprintf("%.2f", adjusted),
+                                "<br>High:", sprintf("%.2f", high), 
+                                "<br>Low:", sprintf("%.2f", low),
+                                "<br>Volume:", formatC(volume, format = "f", 
+                                                       digits = 1, big.mark = ",")))
+    req(nrow(data) > 0)
+    data
+  })
+  
+  
+  
+  # Render the raw data table
+  output$table <- renderDT({
+    # Prepare the data
+  dataForTable <- 
+    filteredData()
+  
+    # Capitalize the first letter of each column name
+  colnames(dataForTable) <- sapply(colnames(dataForTable), function(name) {
+    paste(toupper(substring(name, 1, 1)), substring(name, 2), sep = "")
+  })
+    
+    # Render the datatable with column filters
+    datatable(
+      dataForTable,
+      filter = "top", # Add filters at the top of all columns 
+      options = list(pageLength = 8, autoWidth = TRUE),
+      caption = htmltools::tags$caption(style = "caption-side: top; font-size: 180%;",
+                                        fontWeight = "bold","Stock Price/Volume Data (raw) 原始量价数据")) %>%
+      formatRound(columns = which(names(dataForTable) %in% c("Adjusted", "High", "Low", "Open", "Close", "Volume", "Marketcap")), digits = 1) %>%
+      formatStyle("Volume", fontWeight = "bold", `data-thousands` = ",", `data-type` = "formatted-num") %>%
+      formatStyle("Adjusted", fontWeight = "bold") %>%
+      formatRound(columns = which(names(dataForTable) == "Volume"), digits = 0) %>%
+      formatRound(columns = which(names(dataForTable) == "Marketcap"), digits = 0)
+})
+
+  # Reactive expression for filtered data with additional variables
+  filteredDataWithAdditionalVars <- reactive({
+    selectedVars <- c(input$variables, input$multiChoiceVars)
+    req(input$symbol, input$dateRange, selectedVars)
+    mega7data_modified %>%
+      filter(symbol == input$symbol, 
+             date >= input$dateRange[1], 
+             date <= input$dateRange[2]) %>%
+      select(date, symbol, all_of(selectedVars)) %>%
+      arrange(desc(date))
+  })
+  
+  
+  # Render the Subjective Filters table
+  output$subjectiveTable <- renderDT({
+    dataForTable <- filteredDataWithAdditionalVars()
+    datatable(
+      dataForTable,
+      options = list(pageLength = 10, autoWidth = TRUE),
+      caption = htmltools::tags$caption(style = "caption-side: top; font-size: 180%;",
+                                        "Data on the Subjective Filters 过滤条件/主观指标数据") 
+        ) %>%
+
+      formatStyle(columns = c(input$multiChoiceVars), fontWeight = 'bold', color = 'blue')
+})
+        
+
+  
+  # Render the Price Chart Plot Candlestick
+  output$candleChart <- renderPlotly({
+    data <- filteredGraphData()
+    req(data$date, data$open, data$adjusted, data$high, data$low)
+  
+    # Constructing the graphs 
+    
+    p <- plot_ly(data, x = ~ date, type ="candlestick",
+                 open = ~ open, close = ~ adjusted,
+                 high = ~ high, low = ~ low,               
+                 increasing = list(line = list(color = "green")),
+                 decreasing = list(line = list(color = "red"))) %>%
+      layout(title = paste("Stock Price for", input$symbol, "US Equity: 日股价"),
+             xaxis = list(title = "Date 日期"),
+             yaxis = list(title = "Price (USD) 股价", autorange = TRUE)) # Apply y-axis range
+    
+    formatted_hover_text <- paste('Date:', format(data$date, "%Y-%m-%d"), 
+                                  '<br>Open:', sprintf("%.2f", data$open), 
+                                  '<br>Close:', sprintf("%.2f", data$adjusted),
+                                  '<br>High:', sprintf("%.2f", data$high), 
+                                  '<br>Low:', sprintf("%.2f", data$low),
+                                  '<br>Volume:', formatC(data$volume, format = "f", 
+                                                         digits = 1, big.mark = ","))
+    
+    p <- p %>% add_trace(
+      x = ~date,
+      y = ~adjusted,
+      type = 'scatter',
+      mode = 'markers',
+      marker = list(size = 1), # Making markers invisible but functional for hover
+      hoverinfo = 'text', 
+      customdata = ~volume,
+      text = ~ hover_text,
+      showlegend = FALSE)
+    
+    
+    return(p)
+    
+  })
+  
+  
+  # Render the Volume Plot
+  
+  output$volumePlot <- renderPlotly({
+    data <- filteredGraphData()
+    req(data$volume)
+    
+    
+    v <- plot_ly(data = data, x = ~date, y = ~volume, name = "Volume", 
+                 type = 'bar', marker = list(color = 'darkorange')) %>%
+      layout(title = paste("Volume for", input$symbol, "US Equity: 日交易量"),
+             xaxis = list(title = "Date 日期"),
+             yaxis = list(title = "Trading Volume 日交易量", tickformat = ",.0f"),
+             hovermode = 'closest')
+    
+ # Add a trend line by connecting volumes with a line
+  v <- add_trace(v, x = ~date, y = ~volume, type = 'scatter', mode = 'lines',
+                 line = list(color = 'green'), name = 'Trend Line 交易量趋势线',
+                 showlegend = FALSE)
+  
+  v
+  
+  })
+  
+  
+   
+ # Dynamic Graphs in Subjective Filters tab
+  output$dynamicGraphs <- renderUI({
+    req(input$multiChoiceVars)
+    vars <- input$multiChoiceVars
+    
+    graphOutputs <- lapply(seq_along(vars), function(i) {
+      varName <- vars[i]
+      plotName <- paste("subjectiveGraph", i, sep = "_")
+      plotlyOutput(plotName)
+    })
+    
+    do.call(tagList, graphOutputs)
+  })
+  
+  
+  observe({
+  lapply(seq_along(input$multiChoiceVars), function(i) {
+    varName <- input$multiChoiceVars[i]
+    outputName <- paste("subjectiveGraph", i, sep = "_")
+    
+    output[[outputName]] <- renderPlotly({
+      req(input$symbol, input$dateRange)
+      data <- filteredDataWithAdditionalVars()
+      
+      # Convert 'date' to Date format if it's not already
+      data$date <- as.Date(data$date)
+      
+      # Ensure non-NA data exists for plotting
+      req(sum(!is.na(data[[varName]])) > 0)
+
+      # Adjust the plot based on the variable
+      if (varName == "average_volume") {
+        # Bar chart for average volume
+        q <- ggplot(data, aes_string(x = "date", y = varName, group = 1)) +
+          geom_bar(stat = "identity", fill = "steelblue") +
+          theme_minimal() +
+          labs(title = "Average Weekly Volume over Time", x = "Date", y = "Average Volume") +
+          scale_x_date(date_breaks = "2 months", date_labels = "%b %Y")
+      } else if (varName == "price_pctchange") {
+        # Line chart for price percent change with color indicating trend
+        q <- ggplot(data, aes_string(x = "date", y = varName, group = 1)) +
+          geom_line(aes(color = ifelse(data[[varName]] >= 0, "green", "red"))) +
+          theme_bw() +
+          labs(title = "Price Percent Change over Time", x = "Date", y = "Percent Change") +
+          scale_color_manual(values = c("green" = "green", "red" = "red")) +
+          scale_x_date(date_breaks = "2 months", date_labels = "%b %Y") +
+          guides(color = FALSE) # Hide the legend for color
+      } else {
+        # Default to a line plot for any other variables
+        q <- ggplot(data, aes_string(x = "date", y = varName, group = 1)) +
+          geom_line() +
+          theme_minimal() +
+          labs(title = paste("Graph of", varName, "over Time"), x = "Date", y = varName) +
+          scale_x_date(date_breaks = "2 months", date_labels = "%b %Y")
+      }
+
+      ggplotly(q, tooltip = "text")
+    })
+  })
+})
+
+  
+  
+
+    
+  
+  output$instructions <- renderUI({
+    HTML('
+      <h3>DEMO Interactive Page 使用方法:</h3>
+      <ul>
+        <h4>数据表格 Data Table:</h4>
+        <li> 1. 左侧下拉框中选择标的<strong>代码</strong>。Select the stock <strong>ticker</strong> from the drop-down menu on the left. </li>
+        <li>2. 在左侧可调整数据展示的时间范围。Input the date range you want the displayed data table to contain. </li>
+        <li>3. 根据需求选择<strong>量价数据</strong>，可多选，所需数据会展示在右侧<strong>数据表</strong>中。Select the <strong>variables</strong> needed, the requested <strong>data table</strong> will be displayed to the right.</li>
+        <li>4. 在数据表上方设定<strong>排序条件</strong>。Set <strong>sorting rules</strong> for each column is available at the top.</li>
+        <h4>股价图表 Price Chart:</h4>
+        <li>1. 框选时间轴放大,移动<strong>时间轴</strong>缩放,<strong>双击恢复默认</strong>时间轴。 Select on the intended area to zoom in, move the <strong>time line tool</strong> to zoom in/out, and <strong>double click to restore the default.</strong>set time line. </li> 
+        <li>2. <strong>移动光标到蜡烛图</strong>可见该交易(日)周期详细量价数据。<strong>Mover cursor or hoover on the candlestick graph</strong> to observe the detailed price and volume data for the (day) duration.</li>
+        <h4>交易量图表 Volume Chart:</h4>
+         <li>1. 框选时间轴放大,移动<strong>时间轴</strong>缩放,<strong>双击恢复默认</strong>时间轴。 Select on the intended area to zoom in, move the <strong>time line tool</strong> to zoom in/out, and <strong>double click to restore the default.</strong>set time line. </li> 
+        <li>2. <strong>移动光标到成交量图表</strong>可见该交易(日)周期的交易量和趋势数据。<strong>Mover cursor or hoover on the volume chart</strong> to observe the exact trading volume data and trend for the (day) duration.</li>
+      </ul>
+    ')
+    
+    
+  })
+}
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Run the application 
+shinyApp(ui22, server22)
+```
+
+
+
+
+
+
+

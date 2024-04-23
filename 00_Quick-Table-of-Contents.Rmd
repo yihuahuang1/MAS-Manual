@@ -1,0 +1,85 @@
+# 快速索引 Quick Table of Contents {-}  
+
+```{r eval=FALSE, include=FALSE}
+<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
+<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
+``` 
+
+## $\diamondsuit$ 多资产策略网页APP入口 MAS Webapp Entrance {-}
+
+[MAS-Stock Selection Webapp](https://webapp.multi-asset-strategy.cn)
+
+```{r toc-1, echo=FALSE}
+knitr::include_url("https://maswebapp.com")
+```
+
+
+## $\diamondsuit$ 全球多资产策略 Into on Global Multi-asset Strategy {-} 
+
+* [全球多资产策略 Into on Global Multi-asset Strategy] for the overview on the Global Tactical Asset Allocation Strategy   [`Multi-asset Strategy Overview`]   
+
+## $\diamondsuit$ 选股模型 Stock Selection Model {-} 
+* [投资策略及模型规划 Investment Strategy Outlook ] for **Investment Thesis** and **Model Planning & Considerations** [`选股模型 Stock Selection Model`]   
+
+### [基础模型：技术指标选股工具 The Base Model: a Technical Signaling Tool for Stock Selection ]{style="color:blue"} {-}
+
+* [基础模型搭建 (Base) Model Construction] for **Model Construction** steps and the **Subjective Filters** [`基础选股模型 Stock Selection Model (Base)`]  
+
+* [技术指标搭建 Technical Indicators Construction] for the construction of all **Technical Indicators** used [`基础选股模型 Stock Selection Model (Base)`]  
+
+* [选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators] for the **dynamically** selection process of the **significant** **technical indicators** [`基础选股模型 Stock Selection Model (Base)`]  
+
+* [基础模型选股表现 (Base) Model Performance] for the `base` **model performance** and **backtest** results [`基础选股模型 Stock Selection Model (Base)`]  
+
+### [完整模型：基于量化指标的全面选股工具 The Complete Model: a Comprehensive Stock Selection Model: Using Quantitative Indicators]{style="color:blue"} {-}
+
+`TBD`
+
+## $\diamondsuit$ 其他资产量化模型 Quantitative Model for other Assets {-}  
+
+`TBD`
+
+## $\diamondsuit$ 资产配置量化模型 Asset Allocation Strategy Using Quantitative Models {-}  
+ 
+`TBD`
+
+## $\diamondsuit$ 组合风险控制和优化 Portfolio Risk Management & Optimization {-} 
+
+* [风险披露 Risk Disclosure ] for the model and portfolio **risks** [`Multi-asset Strategy Quant Approach`]  
+
+
+## $\diamondsuit$ 附录 Appendix {-} 
+
+* [附录 Appendix] for the codes and our resources [`Multi-asset Strategy Quant Approach`]  
+
+
+
+
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;"></div>
+
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+    内部资料，请勿外传! 
+
+    Internal documents, please do not disseminate! 
+
+    本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+    均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+    以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+    The web-based Quantitative Model e-Manual and web application are for information
+    purposes only. The information and opinion contained and expressed herein, shall not,
+    and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+    solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+    representation of any kind or form whatsoever to buy or sell any security, financial
+    instrument or any investment or other specific product.
+</div>
+
+
+
+
+
+
+
+

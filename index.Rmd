@@ -1,45 +1,117 @@
---- 
-title: "Making free books with RStudio’s RMarkdown & Bookdown"
-author: "Julie Lowndes"
+---
+title: "多资产策略量化模型 </br>
+Multi-asset Investment Strategy " 
+subtitle: "Using Quantitative Models"
+author: 
+  - name: "沈博文, 黄翊华(实习生)             Bowen Shen, Albert Huang (intern)"
+    url: https://github.com/yihuahuang1
+#affiliation: GF International Investment Management Limited
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
-# output: bookdown::gitbook
+output:bookdown::gitbook:
+  css: style.css
+  html_document:
+      includes: 
+        after_body:footer.html
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-github-repo: openscapes/series
-description: "A mini bookdown tutorial book on how to make bookdown books."
+github-repo: 
+header-includes:
+  - \usepackage{draftwatermark}
+  - \usepackage{xcolor}
+  - \usepackage{siunitx}
+  - \newcolumntype{d}{S[table-format=3.2]}
+output:
+  bookdown::gitbook:
+    lib_dir: assets
+    split_by: section
+rticles::ctex:
+   fig_caption: yes
+   number_sections: yes
+   toc: yes
+   toc_depth: 3
+editor_options: 
+  markdown: 
+    wrap: sentence
+description: "全球多资产量化模型搭建说明 Global Multi-asset Strategy(MAS) Quantitative Model e-Manual"
 ---
 
-# Welcome {#welcome}
+# 主页 MAS Homepage{-}
 
-hi
+```{r eval=FALSE, include=FALSE}
+<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
+<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
+```
 
-It's possible to create beautiful books for free using [RStudio's R Markdown](http://rmarkdown.rstudio.com/) and Yihui Xie's [bookdown](https://bookdown.org/yihui/bookdown/) and hosting them on [Github](http://github.com). This is pretty new and incredibly cool. It is a really powerful way to communicate science using the same reproducible workflow you use for your analyses and collaborations.
+<span style="color:black;font-weight:700;font-size:26px">Global Multi-asset Strategy</span>  
 
-This tutorial borrows heavily from a lot of great tutorials and resources you should check out too -- there are links throughout. It also parallels a previous tutorial [Making free websites with RStudio’s R Markdown](https://jules32.github.io/rmarkdown-website-tutorial/).
-
-The best way to learn is to follow along with your own laptop, but all are welcome. We'll spend half the time with the tutorial and half the time for you to work on your own website and get help. If you bring your laptop please do this beforehand: 
-
-1. install [RStudio](https://www.rstudio.com/products/rstudio/download/)
-1. create a [GitHub]((http://github.com)) account ([advice](http://happygitwithr.com/github-acct.html))
-1. set up your computer to talk to GitHub
-    - have RStudio linked directly (highly recommended) ([instructions sections 8-14](http://happygitwithr.com/hello-git.html))
-    - or install the [Desktop App](https://desktop.github.com/)
-    - or be familiar with git commands for the command line ([tutorial](https://try.github.io/levels/1/challenges/1))
-
-----
+```{r ind1, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::include_graphics("homepagefigure.jpeg")
+```
 
 
-**Examples:**
 
-We have been using bookdown for the Ocean Health Index:  [**ohi-science.org/data-science-training**](http://ohi-science.org/data-science-training) and Openscapes: [**openscapes.org/series**](https://openscapes.org/series).  
-And R Markdown is much more than books and websites -- here's a [**one-minute video about R Markdown**](http://rmarkdown.rstudio.com/lesson-1.html) to get you excited. 
 
-----
+***
 
-## Learn all about Bookdown
+***GF International Investment Management Limited*** ©
 
-The best way to learn more about bookdown is from Yihui Xie himself. You can read his book [bookdown: Authoring Books and Technical Documents with R Markdown](https://bookdown.org/yihui/bookdown/) or watch his webinar [introducing bookdown](https://www.rstudio.com/resources/webinars/introducing-bookdown/).
+***Global Multi-asset Strategy (MAS) Quantitative Model*** [***e-Manual***](https://www.multiassetstrategy.cn)
+
+***MAS Webapp*** [*link*](https://webapp.multi-asset-strategy.cn)  
+
+**Version** [*v 0.1*](https://github.com/yihuahuang1/mas_public)
+ 
+**Created and Maintained by ©:**  
+
+*沈博文 Bowen Shen*    
+
+*黄翊华 Yihua Huang* (intern)
+
+**Last Update:** `r format(Sys.time(), '%Y-%m-%d %H:%M:%S')`
+
+
+
+> "I thoroughly disapprove of duels. If a man should challenge me,
+  I would take him kindly and forgivingly by the hand and lead him
+  to a quiet place and kill him."
+>
+> --- Mark Twain
+
+
+
+<div style="text-align: right;">
+**返回目录  **[快速索引 Quick Table of Contents] 
+</div>
+
+
+
+
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;"></div>
+
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+    内部资料，请勿外传! 
+
+    Internal documents, please do not disseminate! 
+
+    本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+    均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+    以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+    The web-based Quantitative Model e-Manual and web application are for information
+    purposes only. The information and opinion contained and expressed herein, shall not,
+    and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+    solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+    representation of any kind or form whatsoever to buy or sell any security, financial
+    instrument or any investment or other specific product.
+</div>
+
+
+
+
+
 

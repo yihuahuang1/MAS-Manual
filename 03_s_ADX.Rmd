@@ -1,0 +1,4 @@
+## [技术指标19：平均方向性指标 Technical Indicator 19: Welles Wilder’s Directional Movement Index (ADX)]{style="color:blue"}
+
+
+`In Progress`

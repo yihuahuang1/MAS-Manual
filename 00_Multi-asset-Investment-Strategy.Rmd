@@ -1,0 +1,131 @@
+# 全球多资产策略 Into on Global Multi-asset Strategy {-}
+
+`In Progress`
+
+```{r eval=FALSE, include=FALSE}
+<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
+<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
+```
+
+## 全球战略资产配置策略 Global Tactical Asset Allocation Strategy (GTAA) {-} 
+
+`In Progress`
+
+The Global Tactical Asset Allocation Strategy (GTAA) is a top-down global macro strategy that seeks to identify and exploit inefficiencies between markets, regions, countries, and sectors. The research and decision-making process is fundamentally driven and discretionary but supported by extensive quantitative research. The strategy invests across global asset classes, including stocks, bonds, currencies, and commodities. 
+
+**全球战略资产配置策略（GTAA）**是一种自上而下的全球宏观策略，旨在识别并利用市场、地区、国家和行业之间的效率差异。研究和决策过程基于基本面，具有自主性，但得到了广泛的量化研究支持。该策略投资于全球各类资产，包括股票、债券、货币和商品。
+
+```{r eval=FALSE, include=FALSE}
+Morgan Stanley (https://www.morganstanley.com/im/en-us/individual-investor/strategies/solutions-and-multi-asset/global-tactical-asset-allocation.html)
+```
+
+## 投资策略 GTAA Investment Strategy {-}
+
+GTAA is a top-down investment strategy.
+It heavily adapts from the All-weather Strategy by Bridgewater Associates.
+The strategy aims to utilize various asset classes globally (Equities, ETFs, Bonds, FXs, and Cash) to capture maximum risk-adjusted returns for the entire duration of our investment.
+The flexibility in adjusting allocation among asset classes, regions, and sectors is a key advantage.
+Based on the Market Timing Hypothesis, this strategy is a widely applied multi-asset portfolio management methodology in mimicking risks, enabling investors to determine optimal entry and exit points for high-yield/risky and less-risky asset classes.
+
+GTAA 投资策略:
+
+GTAA是一种自上而下的投资策略。
+该策略在很大程度上借鉴了*Bridgewater Associates*的全天候策略。
+策略旨在全球范围内利用各种资产类别（股票、ETF、债券、外汇和现金）来获取我们整个投资期间的最大风险调整收益。
+在资产类别、地区和行业之间调整配置的灵活性是其一大优势。
+基于市场时机假设，该策略是一种广泛应用的多资产组合管理方法，用于模拟风险，使投资者能够确定高收益/高风险资产类别和低风险资产类别的最佳进入和退出点。
+
+
+## 投资范围与建立组合 Investment Scope & Portfolio Construction {-}
+
+`In Progress`
+
+
+
+Use EM and Tech stocks as major risky assets, hedged by 10Y US-Govt Bonds, Gold futures, and Cash/CDs.
+Asset allocation and timing (TAA) heavily depend on global macros, fundamentals, and quantitative asset allocation and portfolio optimization models.
+Investment timing: when to enter or exit positions.
+Investment class choices include Equities vs. Fixed Income products, small cap vs. large cap, value vs. growth.
+Global scope and timing (G): region, country, and sector selections within asset classes: DM vs. EM (FI products, Equities, ETFs, FX deviations) and which specific country/region.
+
+
+以新兴市场和科技股作为主要风险资产，通过美国10年期政府债券、黄金期货和现金/定期存款进行对冲。
+资产配置和择时（TAA）：配置比例依赖于全球宏观经济、基本面和资产配置及投资组合优化的多策略量化模型。
+投资时机：何时进入或退出头寸。
+投资类别选择：股票与固定收益产品、小盘股与大盘股、价值股与成长股。
+全球范围和时机（G）：在资产类别内选择地区、国家和行业：发达市场与新兴市场（固定收益产品、股票、ETF、外汇波动）及具体的国家/地区。
+
+Use emerging markets and technology stocks as the primary risky assets, hedged with 10-year U.S. government bonds, gold futures, and cash/certificates of deposit.
+Asset Allocation and Timing (TAA): The allocation percentages are heavily dependent on global macroeconomic conditions, fundamentals, and quantitative asset allocation and portfolio optimization models.
+Investment Timing: Determining when to enter or exit positions.
+Investment Class Choices: Equities vs. fixed income products, small cap vs. large cap, value vs. growth stocks.
+Global Scope and Timing (G): Choices of regions, countries, and sectors within asset classes: developed markets vs. emerging markets (Fixed Income products, Equities, ETFs, FX deviations), and specific country/region selections.  
+
+投资组合构建:
+
+使用新兴市场和科技股作为主要风险资产，通过美国10年期政府债券、黄金期货和现金/定期存款进行对冲。
+资产配置和择时（TAA）：配置比例极大地依赖于全球宏观经济状况、基本面以及量化资产配置和投资组合优化模型。
+投资时机：确定进入或退出头寸的时机。
+投资类别选择：股票与固定收益产品、小盘股与大盘股、价值股与成长股。
+全球范围和时机（G）：在资产类别内选择地区、国家和行业：发达市场与新兴市场（固定收益产品、股票、ETF、外汇波动），以及具体的国家/地区选择。
+
+
+## 投研流程 Investment & Research Process {-} 
+
+`In Progress`
+
+Investment Research Process - GTAA-based Portfolio:
+
+Our team maintains an active management approach in constructing portfolios that maximize long-term risk-adjusted returns, which are suitable for the investors' needs and risk tolerance.
+We select from various asset classes and securities globally that are most appropriate given the current market dynamics, aiming for maximum long-term risk-adjusted returns while proactively controlling the maximum drawdown.
+Risk Management: We have a moderate risk preference in asset allocations and actively manage risks specific to securities and sudden market shifts. Tools include stop-loss levels, stress tests, and an internal risk management team.  
+
+
+投资研究流程 - 基于GTAA的投资组合：
+
+我们的团队采取主动管理的模式，以构建可长期持有的投资组合为目的，最大化风险调整回报，同时符合投资者的投资需求和风险承受能力。
+在全球范围内选择各种资产类别和证券，在考虑当前市场动态下，旨在实现最大的长期风险调整回报，同时积极控制最大回撤。
+风险管理：在资产配置上偏好中度风险，并针对特定证券风险和突发市场变动进行积极的风险管理。工具包括：止损水平线、压力测试和内部风险管理团队。
+
+
+
+
+## 风险管理 Risk Management {-} 
+
+`In Progress`
+
+
+<div style="text-align: right;">
+**返回目录  **[快速索引 Quick Table of Contents] 
+</div>
+
+
+
+
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;"></div>
+
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+    内部资料，请勿外传! 
+
+    Internal documents, please do not disseminate! 
+
+    本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+    均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+    以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+    The web-based Quantitative Model e-Manual and web application are for information
+    purposes only. The information and opinion contained and expressed herein, shall not,
+    and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+    solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+    representation of any kind or form whatsoever to buy or sell any security, financial
+    instrument or any investment or other specific product.
+</div>
+
+
+
+
+
+
+

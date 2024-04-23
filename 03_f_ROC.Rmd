@@ -1,0 +1,40 @@
+## <span style="color:blue">技术指标6：变化率 Technical Indicator 6: Rate of Change (ROC)</span> 
+
+
+```{r 306-98, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# Define function to read another rmd file
+source_rmd <- function(file, local = FALSE, ...){
+  options(knitr.duplicate.label = 'allow')
+
+  tempR <- tempfile(tmpdir = ".", fileext = ".R")
+  on.exit(unlink(tempR))
+  knitr::purl(file, output=tempR, quiet = TRUE)
+
+  envir <- globalenv()
+  source(tempR, local = envir, ...)
+}
+```
+
+```{r 306-99, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# Read in base model construction rmd to continue with 3.4
+#source_rmd("03_e_BB.Rmd")
+```
+
+`In Progress`
+
+To put this in practice, if an increase in volume is observed with a steady increase in price, the instrument can be viewed as steady and strong.
+However, if volume and price are changing in different directions, a reversal might be happened.
+
+-   In terms of trading price, traders often observed the trends based on the charts shape and cross in ways that form shapes - often times with weird names like ‘head and shoulder’, ’ reverse head and sholder’, ‘double top’, ‘golden cross’, etc. A golden cross indicates a long term bull market going forward, whereas the death cross is the exact opposite, indicating a potential long term bear market. Both of these refer to the confirmation of long term trend by the occurance of the overlapping of moving average lines as shown below.
+
+
+
+
+
+
+
+
+
+
+
+
