@@ -1,11 +1,13 @@
 # 投资策略及模型规划 Investment Strategy Outlook 
 
+
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
+
 ## 研究目标 Research Objectives 
 
-```{r eval=FALSE, include=FALSE}
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-```
+
 
 For the purpose in discovering the potential U.S. equity investment opportunities, we are attempting to utilize a quantitative methodology based on a programming approach which adapts a price/volume or trend trading strategy by constructing a model using a combination of objective evaluation criteria, technical indicators, and fundamental factors.
 

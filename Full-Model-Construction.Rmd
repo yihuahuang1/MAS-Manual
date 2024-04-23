@@ -1,5 +1,10 @@
 # 完整模型设计及搭建 Full Model Construction 
 
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
+
+
 `TBD`
 
 ## 完整量价选股模型搭建及设计 Intro on Full Model Design & Construction 

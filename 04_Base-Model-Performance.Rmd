@@ -1,13 +1,10 @@
 # 基础模型选股表现 (Base) Model Performance 
 
-```{r eval=FALSE, include=FALSE}
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-```
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
 
 `In Progress`
-
-
 
 
 ```{r 400-1, message=FALSE, warning=FALSE, include=FALSE}

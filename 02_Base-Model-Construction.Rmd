@@ -1,31 +1,9 @@
-# (PART) 第一部分-A 基础模型  {-}
-
-# Part 1-a: 基础模型：技术指标选股工具 {-}
-
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-
-<span style="color:black;font-weight:700;font-size:28px">基础模型：技术指标选股工具 </span>  
-
-<span style="color:black;font-weight:700;font-size:28px">The Base Model: a Technical Signaling Tool for Stock Selection </span>  
-
-</br>
-
-
 # 基础模型搭建 (Base) Model Construction 
 
 
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-
-</br>
-
-```{r eval=FALSE, include=FALSE}
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-```
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
 
 ## 模型设计搭建概要 Intro on (Base) Model Design and Construction 
 

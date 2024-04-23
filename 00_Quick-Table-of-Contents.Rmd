@@ -1,20 +1,19 @@
 # 快速索引 Quick Table of Contents {-}  
 
-```{r eval=FALSE, include=FALSE}
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-``` 
 
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
 ## $\diamondsuit$ 多资产策略网页APP入口 MAS Webapp Entrance {-}
 
-[MAS-Stock Selection Webapp](https://webapp.multi-asset-strategy.cn)
+[MAS-Stock Selection Webapp](https://maswebapp.com)
 
 ```{r toc-1, echo=FALSE}
 knitr::include_url("https://maswebapp.com")
 ```
 
 
-## $\diamondsuit$ 全球多资产策略 Into on Global Multi-asset Strategy {-} 
+## $\diamondsuit$ 全球多资产策略 Into on Global Multi-asset Strategy  {-}
 
 * [全球多资产策略 Into on Global Multi-asset Strategy] for the overview on the Global Tactical Asset Allocation Strategy   [`Multi-asset Strategy Overview`]   
 

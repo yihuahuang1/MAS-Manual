@@ -1,5 +1,9 @@
 # 选股策略模型总结 Stock Selection Strategy & Model Summary 
 
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
+
 
 `TBD`
 

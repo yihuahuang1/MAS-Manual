@@ -1,5 +1,10 @@
 # 资产配置量化模型 Asset Allocation Strategy Using Quantitative Models 
 
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
+
+
 ## Dynamic Asset Allocation Model - A Quant tool to Optimize Portfolio Performance & RM
 
 `TBD`

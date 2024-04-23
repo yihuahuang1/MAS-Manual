@@ -1,9 +1,9 @@
 ---
-title: "多资产策略量化模型 </br>
-Multi-asset Investment Strategy " 
+title: "全球多资产策略量化模型 </br>
+Global Multi-asset Investment Strategy " 
 subtitle: "Using Quantitative Models"
 author: 
-  - name: "沈博文, 黄翊华(实习生)             Bowen Shen, Albert Huang (intern)"
+  - name: "沈博文 Bowen Shen & 黄翊华(实习生) Albert Huang (intern)"
     url: https://github.com/yihuahuang1
 #affiliation: GF International Investment Management Limited
 date: "`r Sys.Date()`"
@@ -26,7 +26,7 @@ header-includes:
 output:
   bookdown::gitbook:
     lib_dir: assets
-    split_by: section
+    split_by: rmd
 rticles::ctex:
    fig_caption: yes
    number_sections: yes
@@ -38,20 +38,20 @@ editor_options:
 description: "全球多资产量化模型搭建说明 Global Multi-asset Strategy(MAS) Quantitative Model e-Manual"
 ---
 
-# 主页 MAS Homepage{-}
 
-```{r eval=FALSE, include=FALSE}
-<span style="color:red;font-weight:700;font-size:28px">DEMO ONLY: Internal Version</span>  
-<span style="color:red;font-weight:700;font-size:28px">内部版本 请勿外传</span> 
-```
+# 多资产策略主页 MAS Homepage{-}
 
-<span style="color:black;font-weight:700;font-size:26px">Global Multi-asset Strategy</span>  
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
+
 
 ```{r ind1, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::include_graphics("homepagefigure.jpeg")
 ```
 
-
+<span style="color:black;font-weight:700;font-size:22px">多资产量化模型搭建说明</span>  
+<span style="color:black;font-weight:700;font-size:22px">Global Multi-asset Strategy (MAS) Quantitative Model e-Manual</span>  
 
 
 ***

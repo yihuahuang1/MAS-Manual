@@ -1,6 +1,10 @@
 
 ## [技术指标25：相关性趋势指标 Technical Indicator 25: Correlation Trend Indicator (CTI)]{style="color:blue"}
 
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
+
 
 `In Progress`
 
@@ -33,13 +37,6 @@
     representation of any kind or form whatsoever to buy or sell any security, financial
     instrument or any investment or other specific product.
 </div>
-
-
-
-
-
-
-
 
 
 

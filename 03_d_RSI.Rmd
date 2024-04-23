@@ -1,4 +1,8 @@
-## <span style="color:blue">技术指标4：相对强弱指数 Technical Indicator 4: Relative Strength Index (RSI)</span> 
+## <span style="color:blue">技术指标4：相对强弱指数 Technical Indicator 4: Relative Strength Index (RSI)</span>  
+
+<span style="color:red;font-weight:700;font-size:18px">Internal Version, DO NOT disseminate!</span>  
+  
+<span style="color:red;font-weight:700;font-size:18px">内部版本 请勿外传!</span> 
 
 Includes `tsignal10`, `tsignal11`, and `tsignal12`
 
@@ -898,4 +902,43 @@ The program is now constructed to generate **daily trading signals** given by th
 $^*$ Whether the **RSI** indicator, or the trading signals `tsignal10`, `tsignal11` and `tsignal12` are effective in selecting stocks to construct a portfolio trading strategies with upsides, will be further analyzed by the model, and refer to **$\S 4.1$ ** [选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators] below for more details. 
 
 $^*$ **RSI**指标或策略交易信号`tsignal10`,`tsignal11`和`tsignal12`在组合交易策略中是否具备有效选择上升潜力股票的能力，将由选股模型进一步分析，详情参考**$\S 4.1$ ** [选取有效的技术指标（动态更新）Dynamic: Selecting Effective Technical Indicators]。
+
+
+
+<div style="text-align: right;">
+**返回目录  **[快速索引 Quick Table of Contents] 
+</div>
+
+
+
+
+<!-- Disclaimer section with a gray bar -->
+<div style="width: 100%; height: 20px; background-color: grey;"></div>
+
+<!-- Disclaimer Text -->
+<div style="padding: 20px; margin-top: 20px; background-color: #f1f1f1;">
+    内部资料，请勿外传! 
+
+    Internal documents, please do not disseminate! 
+
+    本网页模型搭建说明及模型网络应用仅供参考。无论是所含信息还是所表达的观点，
+    均不得明示或暗示为任何形式的建议、提供、招揽、邀请、广告、诱导、推荐或代表，
+    以买卖任何证券、金融工具或任何投资或其他特定产品。
+
+    The web-based Quantitative Model e-Manual and web application are for information
+    purposes only. The information and opinion contained and expressed herein, shall not,
+    and shall not be deemed to, construed, expressly or impliedly, as advice, offer or
+    solicitation of an offer, invitation, advertisement, inducement, recommendation, or
+    representation of any kind or form whatsoever to buy or sell any security, financial
+    instrument or any investment or other specific product.
+</div>
+
+
+
+
+
+
+
+
+
 
